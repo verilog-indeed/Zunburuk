@@ -11,3 +11,6 @@ data class EquationParameters(val Y_NAUGHT: Double, val Y_PRIME_NAUGHT: Double,
 *        b is Y_FACTOR
 *        etc...
 * */
+
+//Y_FACTOR also represents the factor of the sin(y) term (y" + aSin(y) = c)
+// in the ODE for a pendulum system, not sure if i should be doing this though..

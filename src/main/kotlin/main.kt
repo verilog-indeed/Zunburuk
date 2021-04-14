@@ -2,23 +2,55 @@ package dz.lightyearsoftworks.zunburuk
 
 import kotlin.math.cos
 import kotlin.math.abs
+import kotlin.math.sin
+import kotlin.math.sqrt
 import kotlin.system.measureTimeMillis
 
 fun main(args: Array<String>) {
     println("Hello World!")
     val deltaT = measureTimeMillis {
-        heunMethod()
+        accuratePendulumTest()
+        //heunMethod()
         //eulerMethod()
     }
     println("Executed with love in $deltaT milliseconds.")
 }
 
+fun accuratePendulumTest()  {
+    val h = 0.00628
+    val Y_factor = 100
+    var Xi = 0.0
+    var Yi = Math.PI/3
+    var Pi = 0.0
+    var k1: Double
+    var k2: Double
+    var u1: Double
+    var u2: Double
+
+    for (i in 1..125)   {
+        println("Y($Xi) = $Yi")
+
+        k1 = Pi
+        k2 = Pi - h * Y_factor * sin(Yi)
+        u1 = - Y_factor * sin(Yi)
+        u2 = - Y_factor * sin(Yi + h * Pi)
+
+        //advancing by one step
+        Xi += h
+        Yi += 0.5 * (k1 + k2) * h
+        Pi += 0.5 * (u1 + u2) * h
+    }
+}
+
 fun heunMethod()    {
+    //this essentially solves a system of two equations: Y' = P and P' = -aY
+    //Yi+1 = Yi + 1/2 (k1 + k2) * h
+    //Pi+1 = Pi + 1/2 (u1 + u2) * h
     val h = 0.01
     val Y_factor = 1
     var Xi = 0.0
     var Yi = 5.0
-    var Pi = 0.0 //P is the first derivative of Y (Y' = P)
+    var Pi = 0.0
     var k1: Double
     var k2: Double
     var u1: Double
@@ -35,6 +67,7 @@ fun heunMethod()    {
         u1 = - Y_factor * Yi
         u2 = - Y_factor * Yi - Y_factor * h * Pi
 
+        //advancing by one step
         Xi += h
         Yi += 0.5 * (k1 + k2) * h
         Pi += 0.5 * (u1 + u2) * h
