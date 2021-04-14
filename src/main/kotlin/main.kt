@@ -2,7 +2,6 @@ package dz.lightyearsoftworks.zunburuk
 
 import kotlin.math.cos
 import kotlin.math.abs
-import kotlin.math.exp
 import kotlin.math.sin
 import kotlin.system.measureTimeMillis
 
