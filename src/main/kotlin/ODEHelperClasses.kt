@@ -3,9 +3,9 @@ package dz.lightyearsoftworks.zunburuk
 /**
  * Represents the parameters and initial conditions tied to an
  * ordinary differential equation, example for a second order
- * linear equation we get y" + ay' + by = c
+ * linear equation we get y" + by' + ay = c
  * where: c is RHS_constant
- *        b is Y_FACTOR
+ *        a is Y_FACTOR
  *        etc...
  * */
 
