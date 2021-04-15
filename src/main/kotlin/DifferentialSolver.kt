@@ -3,7 +3,8 @@ package dz.lightyearsoftworks.zunburuk
 import kotlin.math.ceil
 import kotlin.math.sin
 
-const val h = 0.01 //the time-step used
+//const val h = 0.01 //the time-step used
+const val h = 0.000023 // for generating sound we need about 44100Hz sampling
 
 class DifferentialSolver  {
 
