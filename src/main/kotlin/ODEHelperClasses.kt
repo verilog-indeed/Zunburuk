@@ -1,7 +1,6 @@
 package dz.lightyearsoftworks.zunburuk
 
 import java.io.InputStream
-import java.lang.Math.floor
 
 /**
  * Represents the parameters and initial conditions tied to an
@@ -28,18 +27,20 @@ enum class DifferentialEquationType {
 
 class functionalInputStream(function: ArrayList<dataPoint>, amplitude: Double) : InputStream() {
     private var pcmValues: IntArray
-    private var position: Long = 0
+    private var position: Long
     override fun read(): Int {
         if (position >= 2 * pcmValues.size) return -1
         val currentIndex =  (position/2).toInt()
         val currentShort = pcmValues[currentIndex]
-        /*//if position is a multiple of 2 it lines up with the LSB of the current value, isolate LSB to the extreme left
-        //else, it lines up with the MSB of the value at (position - 1), isolate MSB to the extreme left
-        var result = if (position.toInt() % 2 == 0) (currentShort shl 24) else (currentShort shl 16)
-        result = result shr 24 //whichever byte was chosen, it is shifted back to the extreme right*/
-        /*or you could do this the sensible way*/
-        val result = if (position.toInt() % 2 == 0) currentShort and 11 else (currentShort and 1100) shr 2
+
+        /*returns the LSByte if this is the first time this index has occurred by ANDing with 0b11111111
+        * else returns the MSByte if this is the second time this index has occurred (currentIndex = position - 1)
+        * and it does so by ANDing the current number with 0b1111111100000000 and then bit-shifting
+        * the result by 8 bits to the right*/
+
+        val result = if (position.toInt() % 2 == 0) currentShort and 0xFF else (currentShort and 0xFF00) shr 8
         position++
+
         return result
     }
 
@@ -48,5 +49,6 @@ class functionalInputStream(function: ArrayList<dataPoint>, amplitude: Double) :
         for (i in pcmValues.indices) {
             pcmValues[i] = kotlin.math.floor(function[i].y * 32767 / amplitude).toInt()
         }
+        position = 0
     }
 }
