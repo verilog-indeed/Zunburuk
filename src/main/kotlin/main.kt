@@ -11,7 +11,7 @@ import kotlin.math.pow
 fun main(args: Array<String>) {
     println("Hello World!")
     var function: ArrayList<dataPoint>
-    for (i in 2..250) {
+    for (i in 10..200) {
         println("${i * 100.0} Hz")
         function = DifferentialSolver().solve(DifferentialEquationType.ORDER2_UNDAMPED,
                 EquationParameters(5.0,
@@ -19,21 +19,23 @@ fun main(args: Array<String>) {
                         (i * 100.0).pow(2.0),
                         0.0,
                         0.0),
-                0.0, 0.1)
+                0.0, 0.7)
         audioTest(function)
     }
 }
 
 fun audioTest(function: ArrayList<dataPoint>) {
     val strem = AudioInputStream(functionalInputStream(function, 5.0),
-                                AudioFormat(96000.0F, 16, 1, true, false),
-                                    96000 * 10)
+                                AudioFormat(44100.0F, 16, 1, true, false),
+                                    44100 * 10)
     val clippy = AudioSystem.getClip()
     try {
         clippy.open(strem)
+        clippy.start()
+        sleep(100) //need to wait for the sound to play in a background thread
     } catch (e: LineUnavailableException)    {
-    /*do nothing :)*/
+
+    } finally {
+        clippy.close() //need to close audio handle because they're exhaustible
     }
-    clippy.start()
-    sleep(100) //need to wait for the sound to play in a background thread
 }
