@@ -25,6 +25,7 @@ enum class DifferentialEquationType {
     ORDER2_UNDAMPED, ORDER2_DAMPED, ORDER2_PENDULUM
 }
 
+
 class functionalInputStream(function: ArrayList<dataPoint>, amplitude: Double) : InputStream() {
     private var pcmValues: IntArray
     private var position: Long

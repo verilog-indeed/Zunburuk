@@ -4,6 +4,7 @@ import java.lang.Thread.sleep
 import javax.sound.sampled.AudioFormat
 import javax.sound.sampled.AudioInputStream
 import javax.sound.sampled.AudioSystem
+import javax.sound.sampled.LineUnavailableException
 import kotlin.collections.ArrayList
 import kotlin.math.pow
 
@@ -28,7 +29,11 @@ fun audioTest(function: ArrayList<dataPoint>) {
                                 AudioFormat(96000.0F, 16, 1, true, false),
                                     96000 * 10)
     val clippy = AudioSystem.getClip()
-    clippy.open(strem)
+    try {
+        clippy.open(strem)
+    } catch (e: LineUnavailableException)    {
+    /*do nothing :)*/
+    }
     clippy.start()
     sleep(100) //need to wait for the sound to play in a background thread
 }
