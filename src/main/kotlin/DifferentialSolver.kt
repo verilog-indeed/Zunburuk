@@ -4,7 +4,7 @@ import kotlin.math.ceil
 import kotlin.math.sin
 
 //const val h = 0.01 //the time-step used
-const val h = 1.0 / 22050.0 // for generating sound we need about 22050Hz/44100Hz sampling
+const val h = 1.0 / 96000.0 // for generating sound we need about 22050Hz/44100Hz sampling
 
 class DifferentialSolver  {
 
