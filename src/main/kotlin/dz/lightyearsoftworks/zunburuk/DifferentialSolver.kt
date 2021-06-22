@@ -3,8 +3,8 @@ package dz.lightyearsoftworks.zunburuk
 import kotlin.math.ceil
 import kotlin.math.sin
 
-//const val h = 0.01 //the time-step used
-const val h = 1.0 / 44100.0
+const val h = 0.01 //the time-step used
+//const val h = 1.0 / 44100.0
 /*for generating sound we need about 22050Hz/44100Hz sampling, much crisper audio is achieved with higher rates
 * but some systems just don't like those sampling rates for whatever reason*/
 
