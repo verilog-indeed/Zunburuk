@@ -18,7 +18,7 @@ data class EquationParameters(val Y_NAUGHT: Double, val Y_PRIME_NAUGHT: Double,
                               val RHS_constant: Double)
 
 /**Represents a single preimage/image pair (t, F(t))*/
-data class dataPoint(val t: Double, val y: Double)  //is this overkill?
+data class ODEDataPoint(val t: Double, val y: Double)  //is this overkill?
 
 /**Defines possible types of ordinary differential equations that can be solved*/
 enum class DifferentialEquationType {
@@ -26,7 +26,7 @@ enum class DifferentialEquationType {
 }
 
 
-class functionalInputStream(function: ArrayList<dataPoint>, amplitude: Double) : InputStream() {
+class functionalInputStream(function: ArrayList<ODEDataPoint>, amplitude: Double) : InputStream() {
     private var pcmValues: IntArray
     private var position: Long
     override fun read(): Int {

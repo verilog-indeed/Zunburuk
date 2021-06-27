@@ -4,12 +4,8 @@ import dz.lightyearsoftworks.zunburuk.*;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
-import javafx.application.Platform;
-import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
@@ -22,17 +18,15 @@ import javafx.util.Duration;
 import java.util.ArrayList;
 
 public class FxMain extends Application {
-    int currentDataIndex = 0;
     @Override
     public void start(Stage primaryStage) throws Exception {
         //Parent root = FXMLLoader.load(getClass().getResource("main_stylesheet.fxml"));
         primaryStage.setTitle("Flamingo!");
 
-        ArrayList<dataPoint> rawData = new DifferentialSolver()
-                .solve(DifferentialEquationType.ORDER2_UNDAMPED,
+        DifferentialSolver oscillatorSystem = new DifferentialSolver(DifferentialEquationType.ORDER2_UNDAMPED,
                         new EquationParameters(1, 0, 1
                                                 , 0, 0),
-                        0.0, 6.28);
+                        0.0, 0.017);
 
 
         NumberAxis timeAxis = new NumberAxis();
@@ -54,12 +48,12 @@ public class FxMain extends Application {
         primaryStage.show();
 
         EventHandler<ActionEvent> chartUpdater = event -> {
+            ODEDataPoint nextValue = oscillatorSystem.nextDataPoint();
             fxData.getData().add(
-                    new XYChart.Data<>(rawData.get(currentDataIndex).getT(), rawData.get(currentDataIndex).getY())
+                    new XYChart.Data<>(nextValue.getT(), nextValue.getY())
             );
-            currentDataIndex++;
         };
-        Timeline updateChart = new Timeline(new KeyFrame(Duration.millis(10), chartUpdater));
+        Timeline updateChart = new Timeline(new KeyFrame(Duration.millis(17), chartUpdater));
         updateChart.setCycleCount(Timeline.INDEFINITE);
         updateChart.play();
     }

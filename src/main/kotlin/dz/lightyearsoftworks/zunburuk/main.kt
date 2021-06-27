@@ -1,5 +1,5 @@
 package dz.lightyearsoftworks.zunburuk
-
+/*
 import java.lang.Thread.sleep
 import javax.sound.sampled.AudioFormat
 import javax.sound.sampled.AudioInputStream
@@ -9,8 +9,9 @@ import kotlin.collections.ArrayList
 import kotlin.math.pow
 
 fun main(args: Array<String>) {
+
     println("Hello World!")
-    var function: ArrayList<dataPoint>
+    var function: ArrayList<ODEDataPoint>
     for (i in 10..200) {
         println("${i * 100.0} Hz")
         function = DifferentialSolver().solve(DifferentialEquationType.ORDER2_UNDAMPED,
@@ -24,7 +25,7 @@ fun main(args: Array<String>) {
     }
 }
 
-fun audioTest(function: ArrayList<dataPoint>) {
+fun audioTest(function: ArrayList<ODEDataPoint>) {
     val strem = AudioInputStream(functionalInputStream(function, 5.0),
                                 AudioFormat(44100.0F, 16, 1, true, false),
                                     44100 * 10)
@@ -39,3 +40,4 @@ fun audioTest(function: ArrayList<dataPoint>) {
         clippy.close() //need to close audio handle because they're exhaustible
     }
 }
+ */
