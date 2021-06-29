@@ -33,11 +33,11 @@ fun audioTest(function: ArrayList<ODEDataPoint>) {
     try {
         clippy.open(strem)
         clippy.start()
-        sleep(100) //need to wait for the sound to play in a background thread
+        sleep(50) //need to wait for the sound to play in a background thread
     } catch (e: LineUnavailableException)    {
 
     } finally {
-        clippy.close() //need to close audio handle because they're exhaustible
+        //clippy.close() //need to close audio handle because they're exhaustible
     }
 }
  */

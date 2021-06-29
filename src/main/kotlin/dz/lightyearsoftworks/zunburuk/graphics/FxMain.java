@@ -6,6 +6,8 @@ import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
@@ -18,8 +20,8 @@ import javafx.util.Duration;
 import java.util.ArrayList;
 
 public class FxMain extends Application {
-    @Override
-    public void start(Stage primaryStage) throws Exception {
+    /*@Override
+    public void start(Stage primaryStage) {
         //Parent root = FXMLLoader.load(getClass().getResource("main_stylesheet.fxml"));
         primaryStage.setTitle("Flamingo!");
 
@@ -56,9 +58,17 @@ public class FxMain extends Application {
         Timeline updateChart = new Timeline(new KeyFrame(Duration.millis(17), chartUpdater));
         updateChart.setCycleCount(Timeline.INDEFINITE);
         updateChart.play();
-    }
+    }*/
 
     public static void main(String[] args)  {
         launch(args);
+    }
+
+    @Override
+    public void start(Stage pStage) throws Exception {
+        Parent root = FXMLLoader.load(getClass().getResource("main_stylesheet.fxml"));
+        Scene main = new Scene(root);
+        pStage.setScene(main);
+        pStage.show();
     }
 }
