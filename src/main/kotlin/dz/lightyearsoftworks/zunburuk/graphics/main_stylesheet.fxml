@@ -36,9 +36,9 @@
                   <Canvas fx:id="mainCanvas" />
                </children>
             </Pane>
-            <LineChart prefHeight="195.0" prefWidth="399.0">
+            <LineChart prefHeight="200.0" prefWidth="400.0" fx:id="graphChart" >
               <xAxis>
-                <CategoryAxis side="BOTTOM" />
+                <NumberAxis side="BOTTOM" />
               </xAxis>
               <yAxis>
                 <NumberAxis side="LEFT" />
