@@ -1,23 +1,16 @@
 package dz.lightyearsoftworks.zunburuk.graphics;
 
-import dz.lightyearsoftworks.zunburuk.*;
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
 import javafx.application.Application;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.chart.LineChart;
-import javafx.scene.chart.NumberAxis;
-import javafx.scene.chart.XYChart;
-import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.layout.Pane;
+import javafx.scene.shape.Line;
 import javafx.stage.Stage;
-import javafx.util.Duration;
 
-import java.util.ArrayList;
+import java.io.IOException;
 
 public class FxMain extends Application {
     /*@Override
@@ -65,8 +58,19 @@ public class FxMain extends Application {
     }
 
     @Override
-    public void start(Stage pStage) throws Exception {
-        Parent root = FXMLLoader.load(getClass().getResource("main_stylesheet.fxml"));
+    public void start(Stage pStage) throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("main_stylesheet.fxml"));
+        loader.load();
+        Parent root = loader.getRoot();
+        /*
+        * Perhaps no need to update everytime window is resized
+        * if its going to update itself on every animation frame anyway?
+        *
+        canvas.widthProperty().bind(((Pane)canvas.getParent()).widthProperty());
+        canvas.heightProperty().bind(((Pane)canvas.getParent()).heightProperty());
+        canvas.widthProperty().addListener(evnt -> redrawCanvas());
+        canvas.heightProperty().addListener(evnt -> redrawCanvas());*/
+
         Scene main = new Scene(root);
         pStage.setScene(main);
         pStage.show();
