@@ -28,7 +28,6 @@ import java.util.ArrayList;
 
 public class FxController {
     public VBox userSettings;
-    public Button boi;
     public ComboBox oscillationTypeComboBox;
     public TextField gravityInputField;
     public TextField lengthInputField;
@@ -40,12 +39,13 @@ public class FxController {
 
     public void onInputFieldChanged(KeyEvent actionEvent) {
         TextField source = (TextField) actionEvent.getSource();
-        /*
-        *checks if there is text which doesn't match the "decimal number"
-        *pattern, replaces violating characters with nothing
+
+       /*Make sure the pattern matches a decimal number, if not it just clears the text field
+        *as long as the user keeps typing invalid patterns
         * */
-        if (!source.getText().matches("(\\d+)(\\.)?(\\d+)?")) {
-            source.setText(source.getText().replaceAll("[^((\\d+)(\\.)?(\\d+)?)]", ""));
+
+        if (!source.getText().matches("((\\d+)(\\.)?(\\d+)?){1}")) {
+            source.setText("");
             source.positionCaret(source.getText().length()); //returns caret to the end of the field
         }
     }
