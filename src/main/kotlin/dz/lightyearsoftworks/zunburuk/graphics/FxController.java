@@ -39,13 +39,11 @@ public class FxController implements Initializable {
     public TextField massInputField;
     public TextField maxDisplacementInputField;
     public Canvas mainCanvas;
-    public DifferentialSolver currentSystem;
     public ImageView imgEqn;
     public Button playButton;
     private GraphicsContext picassoThePainter;
     private Timeline currentAnimation;
     private final ArrayList<TextField> availableInputFields = new ArrayList<>();
-    SimulationSpecificRedraw redrawSimulationObject;
 
 
     public void onPlayButtonPress(ActionEvent actionEvent) {
@@ -55,58 +53,83 @@ public class FxController implements Initializable {
             }
         }
 
-
-        double maxAngle, gravity, tetherLength;
-
-        try {
-            maxAngle = Double.parseDouble(maxAngleInputField.getText());
-            gravity = Double.parseDouble(gravityInputField.getText());
-            tetherLength = Double.parseDouble(lengthInputField.getText());
-        } catch (NumberFormatException e)   {
-            System.out.println("fix your regex, 7mar");
-            return;
-        }
+        DifferentialSolver currentSystem1, currentSystem2;
+        EventHandler<ActionEvent> simulationSteppingHandler;
+        double maxAngle, gravity, tetherLength, maxDisplacement, springConst, mass;
 
         if (currentAnimation != null)   {
             currentAnimation.stop();
         }
 
-        mainCanvas.widthProperty().bind(((Pane)mainCanvas.getParent()).widthProperty());
-        mainCanvas.heightProperty().bind(((Pane)mainCanvas.getParent()).heightProperty());
-        picassoThePainter = mainCanvas.getGraphicsContext2D();
+        switch (oscillationTypeComboBox.getValue()) {
+            case ("Simple Pendulum") -> {
+                try {
+                    maxAngle = Double.parseDouble(maxAngleInputField.getText());
+                    gravity = Double.parseDouble(gravityInputField.getText());
+                    tetherLength = Double.parseDouble(lengthInputField.getText());
+                } catch (NumberFormatException e)   {
+                    throw new RuntimeException("fix your regex, 7mar");
+                }
 
-        currentSystem = new DifferentialSolver(DifferentialEquationType.ORDER2_PENDULUM,
+                currentSystem1 = new DifferentialSolver(DifferentialEquationType.ORDER2_PENDULUM,
                         new EquationParameters(maxAngle,
-                            0,
-                            gravity / tetherLength,
-                            0, 0),
-                    0.0, 1.0 / 60.0);
+                                0,
+                                gravity / tetherLength,
+                                0, 0),
+                        0.0, 1.0 / 60.0);
 
-        redrawSimulationObject = (dp) -> {
-            double width = mainCanvas.getWidth(); double height = mainCanvas.getHeight();
-            picassoThePainter.setLineWidth(3.0);
-            double currentX = width/2.0 + 100 * tetherLength * Math.sin(dp.getY());
-            double currentY = 60 + 100 * tetherLength * Math.cos(dp.getY());
-            picassoThePainter.strokeLine(width/2.0,
-                                        60,
-                                        currentX,
-                                        currentY);
-            picassoThePainter.setFill(Color.INDIANRED);
-            picassoThePainter.fillOval(currentX - 15.0,currentY - 15.0,30.0,30.0);
-            picassoThePainter.strokeOval(currentX - 15.0,currentY - 15.0,30.0,30.0);
-            picassoThePainter.setLineWidth(1.0);
-        };
+                simulationSteppingHandler = event -> {
+                    ODEDataPoint dp = currentSystem1.nextDataPoint();
+                    clearCanvas();
+                    redrawPendulum(dp, tetherLength);
+                    redrawBase();
+                };
+            }
+            case ("Mass on a Vertical Spring") -> {
+                try {
+                    maxDisplacement = Double.parseDouble(maxDisplacementInputField.getText());
+                    springConst = Double.parseDouble(springConstInputField.getText());
+                    mass = Double.parseDouble(massInputField.getText());
+                } catch (NumberFormatException e)   {
+                    throw new RuntimeException("fix your regex, 7mar");
+                }
+                currentSystem1 = new DifferentialSolver(DifferentialEquationType.ORDER2_UNDAMPED,
+                        new EquationParameters(maxDisplacement,
+                                0,
+                                springConst / mass,
+                                0, 0),
+                        0.0, 1.0 / 60.0);
 
-        EventHandler<ActionEvent> simulationSteppingHandler = event -> {
-            ODEDataPoint dp = currentSystem.nextDataPoint();
-            clearCanvas();
-            redrawSimulationObject.draw(dp);
-            redrawBase();
-        };
+                simulationSteppingHandler = event -> {
+                    ODEDataPoint dp = currentSystem1.nextDataPoint();
+                    clearCanvas();
+                    //redrawSimulationObject.draw(dp);
+                    redrawBase();
+                };
+            }
+            default -> simulationSteppingHandler = null;
+        }
 
-        currentAnimation = new Timeline(new KeyFrame(Duration.seconds(1/60.0), simulationSteppingHandler));
-        currentAnimation.setCycleCount(Timeline.INDEFINITE);
-        currentAnimation.play();
+        if (simulationSteppingHandler != null) {
+            currentAnimation = new Timeline(new KeyFrame(Duration.seconds(1 / 60.0), simulationSteppingHandler));
+            currentAnimation.setCycleCount(Timeline.INDEFINITE);
+            currentAnimation.play();
+        }
+    }
+
+    private void redrawPendulum(ODEDataPoint dp, double wireLength) {
+        double width = mainCanvas.getWidth(); double height = mainCanvas.getHeight();
+        picassoThePainter.setLineWidth(3.0);
+        double currentX = width/2.0 + 100 * wireLength * Math.sin(dp.getY());
+        double currentY = 60 + 100 * wireLength * Math.cos(dp.getY());
+        picassoThePainter.strokeLine(width/2.0,
+                60,
+                currentX,
+                currentY);
+        picassoThePainter.setFill(Color.INDIANRED);
+        picassoThePainter.fillOval(currentX - 15.0,currentY - 15.0,30.0,30.0);
+        picassoThePainter.strokeOval(currentX - 15.0,currentY - 15.0,30.0,30.0);
+        picassoThePainter.setLineWidth(1.0);
     }
 
     private void redrawBase() {
@@ -127,6 +150,9 @@ public class FxController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        mainCanvas.widthProperty().bind(((Pane)mainCanvas.getParent()).widthProperty());
+        mainCanvas.heightProperty().bind(((Pane)mainCanvas.getParent()).heightProperty());
+        picassoThePainter = mainCanvas.getGraphicsContext2D();
         oscillationTypeComboBox.getItems().add("Simple Pendulum");
         oscillationTypeComboBox.getItems().add("Mass on a Vertical Spring");
     }
@@ -176,7 +202,4 @@ public class FxController implements Initializable {
         }
     }
 
-    private interface SimulationSpecificRedraw {
-        public abstract void draw(ODEDataPoint currentState);
-    }
 }
