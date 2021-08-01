@@ -190,16 +190,13 @@ public class FxController implements Initializable {
         }
     }
 
+    /**Make sure the pattern matches a decimal number, if not it just clears the text field
+     *everytime the user types an invalid pattern
+     * */
     public void onInputFieldChanged(KeyEvent actionEvent) {
         TextField source = (TextField) actionEvent.getSource();
-
-        /*Make sure the pattern matches a decimal number, if not it just clears the text field
-         *everytime the user types an invalid pattern
-         * */
-
         if (!source.getText().matches("((\\d+)(\\.)?(\\d+)?){1}")) {
             source.clear();
         }
     }
-
 }
