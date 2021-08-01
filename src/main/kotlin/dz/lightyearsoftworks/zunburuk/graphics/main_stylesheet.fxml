@@ -1,49 +1,65 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.canvas.Canvas?>
-<?import javafx.scene.chart.CategoryAxis?>
-<?import javafx.scene.chart.LineChart?>
-<?import javafx.scene.chart.NumberAxis?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-<SplitPane dividerPositions="0.5" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="dz.lightyearsoftworks.zunburuk.graphics.FxController">
+<SplitPane dividerPositions="0.35" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="dz.lightyearsoftworks.zunburuk.graphics.FxController">
   <items>
       <VBox fx:id="userSettings" alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="25">
          <children>
-            <ComboBox fx:id="oscillationTypeComboBox" prefHeight="0.0" prefWidth="500.0" style="-fx-border-width: 10;" />
-            <ImageView fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@resources/ode_pendulum.png" />
-               </image>
+            <ComboBox fx:id="oscillationTypeComboBox" onAction="#onSimTypeSelection" prefHeight="25.0" prefWidth="325.0" promptText="Select oscillator type..." style="-fx-border-width: 10;" />
+            <ImageView fx:id="imgEqn" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" visible="false" managed="false">
             </ImageView>
-            <TextField fx:id="gravityInputField" onKeyTyped="#onInputFieldChanged" prefHeight="25.0" prefWidth="589.0" promptText="Enter a value for g..." />
-            <TextField fx:id="lengthInputField" onKeyTyped="#onInputFieldChanged" prefHeight="25.0" prefWidth="589.0" promptText="Enter a value for length L..." />
-            <TextField fx:id="maxMoveInputField" onKeyTyped="#onInputFieldChanged" prefHeight="25.0" prefWidth="589.0" promptText="Enter a value for maximum angle displacement..." />
-            <Button mnemonicParsing="false" text="Play!" onAction="#onPlayButtonPress"/>
+            <TextField fx:id="gravityInputField" alignment="CENTER" onKeyTyped="#onInputFieldChanged" prefHeight="25.0" prefWidth="597.0" promptText="Enter a value for g..." visible="false" managed="false">
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </TextField>
+            <TextField fx:id="lengthInputField" alignment="CENTER" onKeyTyped="#onInputFieldChanged" prefHeight="25.0" prefWidth="589.0" promptText="Enter a value for length L..." visible="false" managed="false">
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </TextField>
+            <TextField fx:id="maxAngleInputField" alignment="CENTER" onKeyTyped="#onInputFieldChanged" prefHeight="25.0" prefWidth="589.0" promptText="Enter a value for maximum angle displacement..." visible="false" managed="false">
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </TextField>
+             <TextField fx:id="springConstInputField" alignment="CENTER" onKeyTyped="#onInputFieldChanged" prefHeight="25.0" prefWidth="597.0" promptText="Enter a value for the spring constant K..." visible="false" managed="false">
+                 <font>
+                     <Font size="18.0" />
+                 </font>
+             </TextField>
+             <TextField fx:id="massInputField" alignment="CENTER" onKeyTyped="#onInputFieldChanged" prefHeight="25.0" prefWidth="589.0" promptText="Enter a value for mass M..." visible="false" managed="false">
+                 <font>
+                     <Font size="18.0" />
+                 </font>
+             </TextField>
+             <TextField fx:id="maxDisplacementInputField" alignment="CENTER" onKeyTyped="#onInputFieldChanged" prefHeight="25.0" prefWidth="589.0" promptText="Enter a value for maximum displacement..." visible="false" managed="false">
+                 <font>
+                     <Font size="18.0" />
+                 </font>
+             </TextField>
+            <Button fx:id="playButton" mnemonicParsing="false" onAction="#onPlayButtonPress" text="Play!" visible="false" managed="false">
+               <font>
+                  <Font size="22.0" />
+               </font></Button>
          </children>
       </VBox>
-      <SplitPane dividerPositions="0.5" orientation="VERTICAL" prefHeight="398.0" prefWidth="590.0">
+      <SplitPane orientation="VERTICAL" prefHeight="398.0" prefWidth="590.0">
         <items>
             <Pane prefHeight="200.0" prefWidth="200.0">
                <children>
                   <Canvas fx:id="mainCanvas" />
                </children>
             </Pane>
-            <LineChart prefHeight="200.0" prefWidth="400.0" fx:id="graphChart" >
-              <xAxis>
-                <NumberAxis side="BOTTOM" />
-              </xAxis>
-              <yAxis>
-                <NumberAxis side="LEFT" />
-              </yAxis>
-            </LineChart>
         </items>
       </SplitPane>
   </items>
