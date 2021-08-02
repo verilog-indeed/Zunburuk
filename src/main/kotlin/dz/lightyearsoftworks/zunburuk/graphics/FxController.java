@@ -63,7 +63,7 @@ public class FxController implements Initializable {
         }
 
         switch (oscillationTypeComboBox.getValue()) {
-            case ("Simple Pendulum") -> {
+            case ("Simple Pendulum"):
                 try {
                     maxAngle = Double.parseDouble(maxAngleInputField.getText());
                     gravity = Double.parseDouble(gravityInputField.getText());
@@ -94,8 +94,8 @@ public class FxController implements Initializable {
                     redrawPendulum(dp, tetherLength);
                     redrawBase();
                 };
-            }
-            case ("Mass on a Vertical Spring") -> {
+                break;
+            case ("Mass on a Vertical Spring"):
                 try {
                     maxDisplacement = Double.parseDouble(maxDisplacementInputField.getText());
                     springConst = Double.parseDouble(springConstInputField.getText());
@@ -123,8 +123,8 @@ public class FxController implements Initializable {
                     redrawSpringMass(dp, maxDisplacement);
                     redrawBase();
                 };
-            }
-            case ("Damped Mass on a Vertical Spring") -> {
+                break;
+            case ("Damped Mass on a Vertical Spring"):
                 try {
                     maxDisplacement = Double.parseDouble(maxDisplacementInputField.getText());
                     springConst = Double.parseDouble(springConstInputField.getText());
@@ -153,8 +153,9 @@ public class FxController implements Initializable {
                     redrawSpringMass(dp, maxDisplacement);
                     redrawBase();
                 };
-            }
-                default -> simulationSteppingHandler = null;
+            break;
+            default:
+                simulationSteppingHandler = null;
         }
 
         if (simulationSteppingHandler != null) {
