@@ -103,7 +103,7 @@ public class FxController implements Initializable {
                 simulationSteppingHandler = event -> {
                     ODEDataPoint dp = currentSystem1.nextDataPoint();
                     clearCanvas();
-                    //redrawSimulationObject.draw(dp);
+                    redrawSpringMass(dp, maxDisplacement);
                     redrawBase();
                 };
             }
@@ -115,6 +115,34 @@ public class FxController implements Initializable {
             currentAnimation.setCycleCount(Timeline.INDEFINITE);
             currentAnimation.play();
         }
+    }
+
+    private void redrawSpringMass(ODEDataPoint dp, double maxDisplacement) {
+        double width = mainCanvas.getWidth(); double height = mainCanvas.getHeight();
+        picassoThePainter.setLineWidth(3.0);
+        double baseX = width/2.0; double baseY = 60;
+        //spring has 14 segments?
+        int springSegs = (int) (maxDisplacement * 4.0);
+        double theta = (Math.PI / 6.0) * (1 - (dp.getY() / maxDisplacement)) + (Math.PI / 8.0);
+
+        picassoThePainter.strokeLine(baseX, baseY, baseX + 20 * Math.sin(theta), baseY + 20 * Math.cos(theta));
+        baseX += 20 * Math.sin(theta);
+        baseY += 20 * Math.cos(theta);
+        theta = -theta;
+        for (int i = 0; i < springSegs; i++)   {
+            picassoThePainter.strokeLine(baseX, baseY, baseX + 40 * Math.sin(theta), baseY + 40 * Math.cos(theta));
+            baseX += 40 * Math.sin(theta);
+            baseY += 40 * Math.cos(theta);
+            theta = -theta;
+        }
+        picassoThePainter.strokeLine(baseX, baseY, baseX + 20 * Math.sin(theta), baseY + 20 * Math.cos(theta));
+        baseX += 20 * Math.sin(theta);
+        baseY += 20 * Math.cos(theta);
+
+        picassoThePainter.setLineWidth(5.0);
+        picassoThePainter.setFill(Color.DARKCYAN);
+        picassoThePainter.fillRect(baseX - 20, baseY, 40, 40);
+        picassoThePainter.strokeRect(baseX - 20, baseY, 40, 40);
     }
 
     private void redrawPendulum(ODEDataPoint dp, double wireLength) {
