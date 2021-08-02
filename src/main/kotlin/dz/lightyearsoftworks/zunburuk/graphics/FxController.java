@@ -76,10 +76,13 @@ public class FxController implements Initializable {
                                 0,
                                 gravity / tetherLength,
                                 0, 0),
-                        0.0, 1.0 / 60.0);
+                        0.0, 1.0 / 6000.0);
 
                 simulationSteppingHandler = event -> {
-                    ODEDataPoint dp = currentSystem1.nextDataPoint();
+                    //ODEDataPoint dp = currentSystem1.nextDataPoint();
+                    //skip through 100 datapoints to sync up animation timestep and simulation timestep
+                    //anim timestep is 1/60, sim timestep is 1/6000
+                    ODEDataPoint dp = stepSimByNSteps(currentSystem1, 100);
                     clearCanvas();
                     redrawPendulum(dp, tetherLength);
                     redrawBase();
@@ -98,10 +101,10 @@ public class FxController implements Initializable {
                                 0,
                                 springConst / mass,
                                 0, 0),
-                        0.0, 1.0 / 60.0);
+                        0.0, 1.0 / 6000.0);
 
                 simulationSteppingHandler = event -> {
-                    ODEDataPoint dp = currentSystem1.nextDataPoint();
+                    ODEDataPoint dp = stepSimByNSteps(currentSystem1, 100);
                     clearCanvas();
                     redrawSpringMass(dp, maxDisplacement);
                     redrawBase();
@@ -117,12 +120,22 @@ public class FxController implements Initializable {
         }
     }
 
+    private ODEDataPoint stepSimByNSteps(DifferentialSolver currentSystem1, int n) {
+        ODEDataPoint result = null;
+        if (currentSystem1 != null) {
+            for (int i = 0; i < n; i++) {
+                result = currentSystem1.nextDataPoint();
+            }
+        }
+        return result;
+    }
+
     private void redrawSpringMass(ODEDataPoint dp, double maxDisplacement) {
-        double width = mainCanvas.getWidth(); double height = mainCanvas.getHeight();
+        double width = mainCanvas.getWidth(); //double height = mainCanvas.getHeight();
         picassoThePainter.setLineWidth(3.0);
         double baseX = width/2.0; double baseY = 60;
-        //spring has 14 segments?
         int springSegs = (int) (maxDisplacement * 4.0);
+        //theta is the angle going counter-clockwise from the y-axis to the spring segment
         double theta = (Math.PI / 6.0) * (1 - (dp.getY() / maxDisplacement)) + (Math.PI / 8.0);
 
         picassoThePainter.strokeLine(baseX, baseY, baseX + 20 * Math.sin(theta), baseY + 20 * Math.cos(theta));
@@ -186,12 +199,7 @@ public class FxController implements Initializable {
     }
 
     public void onSimTypeSelection(ActionEvent actionEvent) {
-        for (TextField t: availableInputFields)  {
-            t.clear();
-            t.setManaged(false);
-            t.setVisible(false);
-        }
-        availableInputFields.clear();
+        hideControls();
         switch (oscillationTypeComboBox.getValue()) {
             case ("Simple Pendulum"):
                 availableInputFields.add(gravityInputField);
@@ -207,6 +215,12 @@ public class FxController implements Initializable {
                 break;
             default:
         }
+        showControls();
+    }
+
+    /**Sets the imagebox, textfields and playbutton back to visible
+     * These controls must be setup properly first before calling this method*/
+    private void showControls() {
         imgEqn.setManaged(true);
         imgEqn.setVisible(true);
 
@@ -216,6 +230,23 @@ public class FxController implements Initializable {
             t.setManaged(true);
             t.setVisible(true);
         }
+    }
+
+    /**Sets the imagebox, textfields and playbutton to invisible
+     * clears the individual textfields and the set of available textfields*/
+    private void hideControls() {
+        imgEqn.setManaged(false);
+        imgEqn.setVisible(false);
+
+        playButton.setManaged(false);
+        playButton.setVisible(false);
+
+        for (TextField t: availableInputFields)  {
+            t.clear();
+            t.setManaged(false);
+            t.setVisible(false);
+        }
+        availableInputFields.clear();
     }
 
     /**Make sure the pattern matches a decimal number, if not it just clears the text field
