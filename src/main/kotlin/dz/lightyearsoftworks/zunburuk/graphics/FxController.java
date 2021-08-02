@@ -41,6 +41,7 @@ public class FxController implements Initializable {
     public Canvas mainCanvas;
     public ImageView imgEqn;
     public Button playButton;
+    public TextField dampingFactorInputField;
     private GraphicsContext picassoThePainter;
     private Timeline currentAnimation;
     private final ArrayList<TextField> availableInputFields = new ArrayList<>();
@@ -55,7 +56,7 @@ public class FxController implements Initializable {
 
         DifferentialSolver currentSystem1, currentSystem2;
         EventHandler<ActionEvent> simulationSteppingHandler;
-        double maxAngle, gravity, tetherLength, maxDisplacement, springConst, mass;
+        double maxAngle, gravity, tetherLength, maxDisplacement, springConst, mass, dampingFactor;
 
         if (currentAnimation != null)   {
             currentAnimation.stop();
@@ -69,6 +70,12 @@ public class FxController implements Initializable {
                     tetherLength = Double.parseDouble(lengthInputField.getText());
                 } catch (NumberFormatException e)   {
                     throw new RuntimeException("fix your regex, 7mar");
+                }
+
+                if (tetherLength == 0.0)  {
+                    lengthInputField.clear();
+                    lengthInputField.setPromptText("Tether length cannot be zero.");
+                    return;
                 }
 
                 currentSystem1 = new DifferentialSolver(DifferentialEquationType.ORDER2_PENDULUM,
@@ -96,6 +103,13 @@ public class FxController implements Initializable {
                 } catch (NumberFormatException e)   {
                     throw new RuntimeException("fix your regex, 7mar");
                 }
+
+                if (mass == 0.0)  {
+                    massInputField.clear();
+                    massInputField.setPromptText("Mass cannot be zero.");
+                    return;
+                }
+
                 currentSystem1 = new DifferentialSolver(DifferentialEquationType.ORDER2_UNDAMPED,
                         new EquationParameters(maxDisplacement,
                                 0,
@@ -110,7 +124,37 @@ public class FxController implements Initializable {
                     redrawBase();
                 };
             }
-            default -> simulationSteppingHandler = null;
+            case ("Damped Mass on a Vertical Spring") -> {
+                try {
+                    maxDisplacement = Double.parseDouble(maxDisplacementInputField.getText());
+                    springConst = Double.parseDouble(springConstInputField.getText());
+                    mass = Double.parseDouble(massInputField.getText());
+                    dampingFactor = Double.parseDouble(dampingFactorInputField.getText());
+                } catch (NumberFormatException e)   {
+                    throw new RuntimeException("fix your regex, 7mar");
+                }
+
+                if (mass == 0.0)  {
+                    massInputField.clear();
+                    massInputField.setPromptText("Mass cannot be zero.");
+                    return;
+                }
+
+                currentSystem1 = new DifferentialSolver(DifferentialEquationType.ORDER2_DAMPED,
+                        new EquationParameters(maxDisplacement,
+                                0,
+                                springConst / mass,
+                                dampingFactor / mass, 0),
+                        0.0, 1.0 / 6000.0);
+
+                simulationSteppingHandler = event -> {
+                    ODEDataPoint dp = stepSimByNSteps(currentSystem1, 100);
+                    clearCanvas();
+                    redrawSpringMass(dp, maxDisplacement);
+                    redrawBase();
+                };
+            }
+                default -> simulationSteppingHandler = null;
         }
 
         if (simulationSteppingHandler != null) {
@@ -146,7 +190,7 @@ public class FxController implements Initializable {
             picassoThePainter.strokeLine(baseX, baseY, baseX + 40 * Math.sin(theta), baseY + 40 * Math.cos(theta));
             baseX += 40 * Math.sin(theta);
             baseY += 40 * Math.cos(theta);
-            theta = -theta;
+            theta = -theta; //reverse x-direction of the next spring segment
         }
         picassoThePainter.strokeLine(baseX, baseY, baseX + 20 * Math.sin(theta), baseY + 20 * Math.cos(theta));
         baseX += 20 * Math.sin(theta);
@@ -196,6 +240,7 @@ public class FxController implements Initializable {
         picassoThePainter = mainCanvas.getGraphicsContext2D();
         oscillationTypeComboBox.getItems().add("Simple Pendulum");
         oscillationTypeComboBox.getItems().add("Mass on a Vertical Spring");
+        oscillationTypeComboBox.getItems().add("Damped Mass on a Vertical Spring");
     }
 
     public void onSimTypeSelection(ActionEvent actionEvent) {
@@ -212,6 +257,13 @@ public class FxController implements Initializable {
                 availableInputFields.add(massInputField);
                 availableInputFields.add(maxDisplacementInputField);
                 imgEqn.setImage(new Image(getClass().getResourceAsStream("resources/ode_springmass.png")));
+                break;
+            case ("Damped Mass on a Vertical Spring"):
+                availableInputFields.add(springConstInputField);
+                availableInputFields.add(massInputField);
+                availableInputFields.add(maxDisplacementInputField);
+                availableInputFields.add(dampingFactorInputField);
+                imgEqn.setImage(new Image(getClass().getResourceAsStream("resources/ode_springmass_damped.png")));
                 break;
             default:
         }
