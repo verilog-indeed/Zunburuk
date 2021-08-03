@@ -11,7 +11,6 @@ import javafx.event.EventHandler;
 import javafx.fxml.Initializable;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
@@ -23,8 +22,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
@@ -65,7 +62,7 @@ public class FxController implements Initializable {
         switch (oscillationTypeComboBox.getValue()) {
             case ("Simple Pendulum"):
                 try {
-                    maxAngle = Double.parseDouble(maxAngleInputField.getText());
+                    maxAngle = Double.parseDouble(maxAngleInputField.getText()) * (Math.PI / 180.0);
                     gravity = Double.parseDouble(gravityInputField.getText());
                     tetherLength = Double.parseDouble(lengthInputField.getText());
                 } catch (NumberFormatException e)   {
