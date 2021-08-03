@@ -26,7 +26,7 @@ enum class DifferentialEquationType {
 }
 
 
-class functionalInputStream(function: ArrayList<ODEDataPoint>, amplitude: Double) : InputStream() {
+class FunctionalInputStream(function: ArrayList<ODEDataPoint>, amplitude: Double) : InputStream() {
     private var pcmValues: IntArray
     private var position: Long
     override fun read(): Int {
@@ -48,7 +48,7 @@ class functionalInputStream(function: ArrayList<ODEDataPoint>, amplitude: Double
     init {
         pcmValues = IntArray(function.size)
         for (i in pcmValues.indices) {
-            pcmValues[i] = kotlin.math.floor(function[i].y * 32767 / amplitude).toInt()
+            pcmValues[i] = kotlin.math.floor(function[i].y * 32767  / amplitude).toInt()
         }
         position = 0
     }
