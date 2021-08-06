@@ -7,7 +7,6 @@ import javax.sound.sampled.AudioSystem
 import javax.sound.sampled.LineUnavailableException
 import kotlin.collections.ArrayList
 import kotlin.math.cos
-import kotlin.math.sin
 
 fun main(args: Array<String>) {
 
@@ -26,10 +25,13 @@ fun main(args: Array<String>) {
     }*/
 
     var Xi = 0.0
+    var frequency = 1000
     for (i in 0..441000)    {
-        function.add(ODEDataPoint(Xi, 10.0 * cos(1000*Xi)))
+        function.add(ODEDataPoint(Xi, 10.0 * cos(frequency * Xi)))
+        //next sample at the rate of 44100Hz
         Xi += 1.0 / 44100.0
     }
+
     audioTest(function)
 }
 

@@ -25,10 +25,13 @@ enum class DifferentialEquationType {
     ORDER2_UNDAMPED, ORDER2_DAMPED, ORDER2_PENDULUM
 }
 
-
+/**Turns a function (array of datapoints) into an audio InputStream as defined in the Javadocs
+ *It is specifically designed to generate audio streams that are to be played at 16-bit single channel signed little-endian PCM */
 class FunctionalInputStream(function: ArrayList<ODEDataPoint>, amplitude: Double) : InputStream() {
     private var pcmValues: IntArray
     private var position: Long
+    /**Sends the data one byte at a time, we send each value in pcmValues twice:
+     *first for the LSB the second for the MSB before moving on to the next value*/
     override fun read(): Int {
         if (position >= 2 * pcmValues.size) return -1
         val currentIndex =  (position/2).toInt()
@@ -47,6 +50,7 @@ class FunctionalInputStream(function: ArrayList<ODEDataPoint>, amplitude: Double
 
     init {
         pcmValues = IntArray(function.size)
+        //linearly normalize given values where 100% amplitude is 32767 (0x7FFF)
         for (i in pcmValues.indices) {
             pcmValues[i] = kotlin.math.floor(function[i].y * 32767  / amplitude).toInt()
         }
