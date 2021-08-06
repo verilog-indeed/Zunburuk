@@ -13,30 +13,33 @@ fun main(args: Array<String>) {
 
     println("Hello World!")
     var function: ArrayList<ODEDataPoint> = ArrayList()
-    /*
+
     var currentSystem = DifferentialSolver(DifferentialEquationType.ORDER2_UNDAMPED,
                                             EquationParameters(10.0, 0.0,
-                                                                1000000.0,0.0, 0.0),
-                                            0.0, 1.0 / 4410000.0)
+                                                                39478418.0,0.0, 0.0),
+                                            0.0, 1.0 / 44100000000.0)
     for (i in 0..441000)   {
         function.add(currentSystem.nextDataPoint())
-        for (j in 0..99) {
+        for (j in 0..999999) {
             currentSystem.nextDataPoint()
         }
-    }*/
+    }
 
     var Xi = 0.0
-    for (i in 0..441000)    {
-        function.add(ODEDataPoint(Xi, 10.0 * cos(1000*Xi)))
+    /*for (i in 0..441000)    {
+        function.add(ODEDataPoint(Xi, 1.0 * cos(2 * Math.PI * 300 * Xi)))
         Xi += 1.0 / 44100.0
-    }
+    }*/
     audioTest(function)
 }
 
 fun audioTest(function: ArrayList<ODEDataPoint>) {
-    val strem = AudioInputStream(FunctionalInputStream(function, 10.0),
-                                AudioFormat(44100.0F, 16, 1, true, false),
-                                    441000)
+    //val strem = AudioInputStream(FunctionalInputStream(function, 10.0),
+                                //AudioFormat(44100.0F, 16, 1, true, false),
+                                    //441000)
+    val strem = AudioInputStream(FunctionalInputStream(function,1.0),
+                AudioFormat(AudioFormat.Encoding.PCM_SIGNED, 44100.0F, 16, 1, 2, 88200.0F, false),
+                441000)
     val clippy = AudioSystem.getClip()
     try {
         clippy.open(strem)
