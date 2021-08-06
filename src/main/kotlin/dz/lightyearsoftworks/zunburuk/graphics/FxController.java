@@ -203,12 +203,14 @@ public class FxController implements Initializable {
     private void redrawPendulum(ODEDataPoint dp, double wireLength) {
         double width = mainCanvas.getWidth(); double height = mainCanvas.getHeight();
         picassoThePainter.setLineWidth(3.0);
+        //datapoints give the value of the angle going counterclockwise from the y-axis to the tether
         double currentX = width/2.0 + 100 * wireLength * Math.sin(dp.getY());
         double currentY = 60 + 100 * wireLength * Math.cos(dp.getY());
         picassoThePainter.strokeLine(width/2.0,
                 60,
                 currentX,
                 currentY);
+        //drawing the pendulum bob
         picassoThePainter.setFill(Color.INDIANRED);
         picassoThePainter.fillOval(currentX - 15.0,currentY - 15.0,30.0,30.0);
         picassoThePainter.strokeOval(currentX - 15.0,currentY - 15.0,30.0,30.0);
