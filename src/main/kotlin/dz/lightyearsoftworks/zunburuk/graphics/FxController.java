@@ -25,6 +25,10 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 
+import static java.lang.Math.cos;
+import static java.lang.Math.sin;
+
+
 public class FxController implements Initializable {
     public ComboBox<String> oscillationTypeComboBox;
     public TextField gravityInputField;
@@ -37,6 +41,9 @@ public class FxController implements Initializable {
     public ImageView imgEqn;
     public Button playButton;
     public TextField dampingFactorInputField;
+    public TextField freq1InputField;
+    public TextField freq2InputField;
+    public TextField phaseInputField;
     private GraphicsContext picassoThePainter;
     private Timeline currentAnimation;
     private final ArrayList<TextField> availableInputFields = new ArrayList<>();
@@ -51,7 +58,7 @@ public class FxController implements Initializable {
 
         DifferentialSolver currentSystem1, currentSystem2;
         EventHandler<ActionEvent> simulationSteppingHandler;
-        double maxAngle, gravity, tetherLength, maxDisplacement, springConst, mass, dampingFactor;
+        double maxAngle, gravity, tetherLength, maxDisplacement, springConst, mass, dampingFactor, freq1, freq2, phi;
 
         if (currentAnimation != null)   {
             currentAnimation.stop();
@@ -154,17 +161,25 @@ public class FxController implements Initializable {
                 simulationSteppingHandler = null;
                 break;
             case ("Lissajous Figures"):
-                double angVel1 = 2.0 * Math.PI * 0.1;
-                double angVel2 = angVel1 * 3.0/1.0;
+                try {
+                    freq1 = Double.parseDouble(freq1InputField.getText());
+                    freq2 = Double.parseDouble(freq2InputField.getText());
+                    phi = Double.parseDouble(phaseInputField.getText()) * (Math.PI / 180.0);
+                } catch (NumberFormatException e)   {
+                    throw new RuntimeException("fix your regex, 7mar");
+                }
+                double angVel1 = 2.0 * Math.PI * freq1;
+                double angVel2 = 2.0 * Math.PI * freq2;
+                double amplitude = 10.0;
                 currentSystem1 = new DifferentialSolver(DifferentialEquationType.ORDER2_UNDAMPED,
-                        new EquationParameters(20.0,
+                        new EquationParameters(amplitude,
                                 0,
                                 angVel1 * angVel1,
                                 0.0, 0),
                         0.0, 1.0 / 6000.0);
                 currentSystem2 = new DifferentialSolver(DifferentialEquationType.ORDER2_UNDAMPED,
-                        new EquationParameters(20.0,
-                                0,
+                        new EquationParameters(amplitude * cos(phi),
+                                -amplitude * angVel2 * sin(phi),
                                 angVel2 * angVel2,
                                 0.0, 0),
                         0.0, 1.0 / 6000.0);
@@ -196,19 +211,19 @@ public class FxController implements Initializable {
         //theta is the angle going counter-clockwise from the y-axis to the spring segment
         double theta = (Math.PI / 6.0) * (1 - (dp.getY() / maxDisplacement)) + (Math.PI / 8.0);
 
-        picassoThePainter.strokeLine(baseX, baseY, baseX + 20 * Math.sin(theta), baseY + 20 * Math.cos(theta));
+        picassoThePainter.strokeLine(baseX, baseY, baseX + 20 * Math.sin(theta), baseY + 20 * cos(theta));
         baseX += 20 * Math.sin(theta);
-        baseY += 20 * Math.cos(theta);
+        baseY += 20 * cos(theta);
         theta = -theta;
         for (int i = 0; i < springSegs; i++)   {
-            picassoThePainter.strokeLine(baseX, baseY, baseX + 40 * Math.sin(theta), baseY + 40 * Math.cos(theta));
+            picassoThePainter.strokeLine(baseX, baseY, baseX + 40 * Math.sin(theta), baseY + 40 * cos(theta));
             baseX += 40 * Math.sin(theta);
-            baseY += 40 * Math.cos(theta);
+            baseY += 40 * cos(theta);
             theta = -theta; //reverse x-direction of the next spring segment
         }
-        picassoThePainter.strokeLine(baseX, baseY, baseX + 20 * Math.sin(theta), baseY + 20 * Math.cos(theta));
+        picassoThePainter.strokeLine(baseX, baseY, baseX + 20 * Math.sin(theta), baseY + 20 * cos(theta));
         baseX += 20 * Math.sin(theta);
-        baseY += 20 * Math.cos(theta);
+        baseY += 20 * cos(theta);
 
         picassoThePainter.setLineWidth(5.0);
         picassoThePainter.setFill(Color.DARKCYAN);
@@ -221,7 +236,7 @@ public class FxController implements Initializable {
         picassoThePainter.setLineWidth(3.0);
         //datapoints give the value of the angle going counterclockwise from the y-axis to the tether
         double currentX = width/2.0 + 100 * wireLength * Math.sin(dp.getY());
-        double currentY = 60 + 100 * wireLength * Math.cos(dp.getY());
+        double currentY = 60 + 100 * wireLength * cos(dp.getY());
         picassoThePainter.strokeLine(width/2.0,
                 60,
                 currentX,
@@ -287,6 +302,10 @@ public class FxController implements Initializable {
                 System.out.println("By Dr. Hefner");
                 break;
             case ("Lissajous Figures"):
+                availableInputFields.add(freq1InputField);
+                availableInputFields.add(freq2InputField);
+                availableInputFields.add(phaseInputField);
+                imgEqn.setImage(new Image(getClass().getResourceAsStream("resources/lissajous_param.png")));
                 break;
             default:
         }

@@ -52,6 +52,21 @@
                      <Font size="18.0" />
                  </font>
              </TextField>
+             <TextField fx:id="freq1InputField" alignment="CENTER" onKeyTyped="#onInputFieldChanged" prefHeight="25.0" prefWidth="589.0" promptText="Enter a value for first frequency..." visible="false" managed="false">
+                 <font>
+                     <Font size="18.0" />
+                 </font>
+             </TextField>
+             <TextField fx:id="freq2InputField" alignment="CENTER" onKeyTyped="#onInputFieldChanged" prefHeight="25.0" prefWidth="589.0" promptText="Enter a value for second frequency..." visible="false" managed="false">
+                 <font>
+                     <Font size="18.0" />
+                 </font>
+             </TextField>
+             <TextField fx:id="phaseInputField" alignment="CENTER" onKeyTyped="#onInputFieldChanged" prefHeight="25.0" prefWidth="589.0" promptText="Enter a value for phase shift phi in degrees..." visible="false" managed="false">
+                 <font>
+                     <Font size="18.0" />
+                 </font>
+             </TextField>
             <Button fx:id="playButton" mnemonicParsing="false" onAction="#onPlayButtonPress" text="Play!" visible="false" managed="false">
                <font>
                   <Font size="22.0" />
