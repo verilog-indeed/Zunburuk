@@ -57,5 +57,13 @@ class DifferentialSolver(eqnType: DifferentialEquationType, initialConditions: E
         advanceOneTimeStep()
         return result
     }
+
+    fun stepSimByNSteps(nSteps :Int): ODEDataPoint   {
+        for (i in 1..nSteps)    {
+            updateHeunFactors()
+            advanceOneTimeStep()
+        }
+        return nextDataPoint()
+    }
 }
 

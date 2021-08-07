@@ -84,7 +84,7 @@ public class FxController implements Initializable {
                     //ODEDataPoint dp = currentSystem1.nextDataPoint();
                     //skip through 100 datapoints to sync up animation timestep and simulation timestep
                     //anim timestep is 1/60, sim timestep is 1/6000
-                    ODEDataPoint dp = stepSimByNSteps(currentSystem1, 100);
+                    ODEDataPoint dp = currentSystem1.stepSimByNSteps(100);
                     clearCanvas();
                     redrawPendulum(dp, tetherLength);
                     redrawBase();
@@ -113,7 +113,7 @@ public class FxController implements Initializable {
                         0.0, 1.0 / 6000.0);
 
                 simulationSteppingHandler = event -> {
-                    ODEDataPoint dp = stepSimByNSteps(currentSystem1, 100);
+                    ODEDataPoint dp = currentSystem1.stepSimByNSteps(100);
                     clearCanvas();
                     redrawSpringMass(dp, maxDisplacement);
                     redrawBase();
@@ -143,7 +143,7 @@ public class FxController implements Initializable {
                         0.0, 1.0 / 6000.0);
 
                 simulationSteppingHandler = event -> {
-                    ODEDataPoint dp = stepSimByNSteps(currentSystem1, 100);
+                    ODEDataPoint dp = currentSystem1.stepSimByNSteps(100);
                     clearCanvas();
                     redrawSpringMass(dp, maxDisplacement);
                     redrawBase();
@@ -154,15 +154,25 @@ public class FxController implements Initializable {
                 simulationSteppingHandler = null;
                 break;
             case ("Lissajous Figures"):
-                currentSystem1 = new DifferentialSolver(DifferentialEquationType.ORDER2_DAMPED,
+                double angVel1 = 2.0 * Math.PI * 0.1;
+                double angVel2 = angVel1 * 3.0/1.0;
+                currentSystem1 = new DifferentialSolver(DifferentialEquationType.ORDER2_UNDAMPED,
                         new EquationParameters(20.0,
                                 0,
-                                100.0,
-                                0.35, 0),
+                                angVel1 * angVel1,
+                                0.0, 0),
                         0.0, 1.0 / 6000.0);
-                GraphPlot graph = new GraphPlot(picassoThePainter);
+                currentSystem2 = new DifferentialSolver(DifferentialEquationType.ORDER2_UNDAMPED,
+                        new EquationParameters(20.0,
+                                0,
+                                angVel2 * angVel2,
+                                0.0, 0),
+                        0.0, 1.0 / 6000.0);
+                GraphPlot graph = new GraphPlot(picassoThePainter, true);
                 simulationSteppingHandler = event -> {
-                    ODEDataPoint dp = stepSimByNSteps(currentSystem1, 100);
+                    ODEDataPoint dp1 = currentSystem1.stepSimByNSteps(100);
+                    ODEDataPoint dp2 = currentSystem2.stepSimByNSteps(100);
+                    ODEDataPoint dp = new ODEDataPoint(dp1.getY(), dp2.getY());
                     clearCanvas();
                     graph.drawNextFrame(dp);
                 };
@@ -176,16 +186,6 @@ public class FxController implements Initializable {
             currentAnimation.setCycleCount(Timeline.INDEFINITE);
             currentAnimation.play();
         }
-    }
-
-    private ODEDataPoint stepSimByNSteps(DifferentialSolver currentSystem1, int n) {
-        ODEDataPoint result = null;
-        if (currentSystem1 != null) {
-            for (int i = 0; i < n; i++) {
-                result = currentSystem1.nextDataPoint();
-            }
-        }
-        return result;
     }
 
     private void redrawSpringMass(ODEDataPoint dp, double maxDisplacement) {
