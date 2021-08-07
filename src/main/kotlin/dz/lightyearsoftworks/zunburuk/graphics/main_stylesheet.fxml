@@ -12,7 +12,7 @@
 
 <SplitPane dividerPositions="0.35" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="1024.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="dz.lightyearsoftworks.zunburuk.graphics.FxController">
   <items>
-      <VBox fx:id="userSettings" alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="25">
+      <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="25">
          <children>
             <ComboBox fx:id="oscillationTypeComboBox" onAction="#onSimTypeSelection" prefHeight="25.0" prefWidth="325.0" promptText="Select oscillator type..." style="-fx-border-width: 10;" />
             <ImageView fx:id="imgEqn" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" visible="false" managed="false">

@@ -3,10 +3,9 @@ package dz.lightyearsoftworks.zunburuk
 import java.lang.Thread.sleep
 import javax.sound.sampled.*
 import kotlin.collections.ArrayList
-import kotlin.math.*
 import kotlin.system.measureTimeMillis
 
-var angVel = 2 * Math.PI * 14000
+var angVel = 2 * Math.PI * 1000
 //minfreq = 70Hz?
 //maxfreq = 14,000Hz?
 //I dont know why, but this is the best tradeoff between sampling rate/nbr of samples and audio quality
@@ -16,7 +15,7 @@ fun main(args: Array<String>) {
 
         var function: ArrayList<ODEDataPoint> = ArrayList()
         var currentSystem = DifferentialSolver(DifferentialEquationType.ORDER2_UNDAMPED,
-                EquationParameters(10.0, 0.0,
+                EquationParameters(5.0, 0.0,
                         angVel * angVel, 0.0, 0.0),
                 0.0, 1.0 / (samplingRate * 200.0))
     val deltaT = measureTimeMillis {

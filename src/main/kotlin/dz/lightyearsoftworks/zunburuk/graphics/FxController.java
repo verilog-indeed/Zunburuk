@@ -18,7 +18,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
 
@@ -27,7 +26,6 @@ import java.util.ArrayList;
 import java.util.ResourceBundle;
 
 public class FxController implements Initializable {
-    public VBox userSettings;
     public ComboBox<String> oscillationTypeComboBox;
     public TextField gravityInputField;
     public TextField lengthInputField;
@@ -151,6 +149,24 @@ public class FxController implements Initializable {
                     redrawBase();
                 };
             break;
+            case ("Beats demo"):
+                System.out.println("By Dr. Hefner");
+                simulationSteppingHandler = null;
+                break;
+            case ("Lissajous Figures"):
+                currentSystem1 = new DifferentialSolver(DifferentialEquationType.ORDER2_DAMPED,
+                        new EquationParameters(20.0,
+                                0,
+                                100.0,
+                                0.35, 0),
+                        0.0, 1.0 / 6000.0);
+                GraphPlot graph = new GraphPlot(picassoThePainter);
+                simulationSteppingHandler = event -> {
+                    ODEDataPoint dp = stepSimByNSteps(currentSystem1, 100);
+                    clearCanvas();
+                    graph.drawNextFrame(dp);
+                };
+                break;
             default:
                 simulationSteppingHandler = null;
         }
@@ -201,7 +217,7 @@ public class FxController implements Initializable {
     }
 
     private void redrawPendulum(ODEDataPoint dp, double wireLength) {
-        double width = mainCanvas.getWidth(); double height = mainCanvas.getHeight();
+        double width = mainCanvas.getWidth();
         picassoThePainter.setLineWidth(3.0);
         //datapoints give the value of the angle going counterclockwise from the y-axis to the tether
         double currentX = width/2.0 + 100 * wireLength * Math.sin(dp.getY());
@@ -241,6 +257,8 @@ public class FxController implements Initializable {
         oscillationTypeComboBox.getItems().add("Simple Pendulum");
         oscillationTypeComboBox.getItems().add("Mass on a Vertical Spring");
         oscillationTypeComboBox.getItems().add("Damped Mass on a Vertical Spring");
+        oscillationTypeComboBox.getItems().add("Beats demo");
+        oscillationTypeComboBox.getItems().add("Lissajous Figures");
     }
 
     public void onSimTypeSelection(ActionEvent actionEvent) {
@@ -264,6 +282,11 @@ public class FxController implements Initializable {
                 availableInputFields.add(maxDisplacementInputField);
                 availableInputFields.add(dampingFactorInputField);
                 imgEqn.setImage(new Image(getClass().getResourceAsStream("resources/ode_springmass_damped.png")));
+                break;
+            case ("Beats demo"):
+                System.out.println("By Dr. Hefner");
+                break;
+            case ("Lissajous Figures"):
                 break;
             default:
         }
