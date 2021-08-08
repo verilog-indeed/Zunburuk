@@ -1,9 +1,6 @@
 package dz.lightyearsoftworks.zunburuk.graphics;
 
-import dz.lightyearsoftworks.zunburuk.DifferentialEquationType;
-import dz.lightyearsoftworks.zunburuk.DifferentialSolver;
-import dz.lightyearsoftworks.zunburuk.EquationParameters;
-import dz.lightyearsoftworks.zunburuk.ODEDataPoint;
+import dz.lightyearsoftworks.zunburuk.*;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
@@ -22,6 +19,8 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
 
+import javax.sound.sampled.*;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
@@ -51,9 +50,13 @@ public class FxController implements Initializable {
     private Timeline currentAnimation;
     private final ArrayList<TextField> availableInputFields = new ArrayList<>();
     private GraphicsContext rembrandtTheRevered;
+    private final float samplingRate = 48000.0F;
+    private final int numberOfSamples = 48000;
+    private Clip systemAudioClip;
 
 
     public void onPlayButtonPress(ActionEvent actionEvent) {
+
         for (TextField t: availableInputFields) {
             if (t.getText().equals("")) {
                 return;
@@ -67,6 +70,9 @@ public class FxController implements Initializable {
 
         if (currentAnimation != null)   {
             currentAnimation.stop();
+        }
+        if (systemAudioClip != null)    {
+            systemAudioClip.stop();
         }
 
         switch (oscillationTypeComboBox.getValue()) {
@@ -169,9 +175,56 @@ public class FxController implements Initializable {
                 };
             break;
             case ("Beats demo"):
-                System.out.println("By Dr. Hefner");
-                simulationSteppingHandler = null;
+                try {
+                    freq1 = Double.parseDouble(freq1InputField.getText());
+                    freq2 = Double.parseDouble(freq2InputField.getText());
+                    phi = Double.parseDouble(phaseInputField.getText()) * (Math.PI / 180.0);
+                } catch (NumberFormatException e)   {
+                    throw new RuntimeException("fix your regex, 7mar");
+                }
+                double angFreq1 = 2.0 * Math.PI * freq1;
+                double angFreq2 = 2.0 * Math.PI * freq2;
+                double maxAmplitude = 5.0;
+                //TODO might be worth having each oscillator with an independent amplitude?
+                currentSystem1 = new DifferentialSolver(DifferentialEquationType.ORDER2_UNDAMPED,
+                        new EquationParameters(maxAmplitude,
+                                0,
+                                angFreq1 * angFreq1,
+                                0.0, 0),
+                        0.0, 1.0 / (samplingRate * 200.0));
+                currentSystem2 = new DifferentialSolver(DifferentialEquationType.ORDER2_UNDAMPED,
+                        new EquationParameters(maxAmplitude * cos(phi),
+                                -maxAmplitude * angFreq2 * sin(phi),
+                                angFreq2 * angFreq2,
+                                0.0, 0),
+                        0.0, 1.0 / (samplingRate * 200.0));
+
+                ArrayList<ODEDataPoint> function = new ArrayList<>();
+                for (int i = 0; i < numberOfSamples; i++)   {
+                    ODEDataPoint dp1 = currentSystem1.stepSimByNSteps(200);
+                    ODEDataPoint dp2 = currentSystem2.stepSimByNSteps(200);
+                    ODEDataPoint dp = new ODEDataPoint(dp1.getT(), dp1.getY() + dp2.getY());
+                    function.add(dp);
+                }
+                currentSystem1.reset();
+                currentSystem2.reset();
+                try {
+                    systemAudioClip = playAudio(function, 2 * maxAmplitude);
+                } catch (LineUnavailableException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                graph = new GraphPlot(picassoThePainter, false);
+                simulationSteppingHandler = event -> {
+                    ODEDataPoint dp1 = currentSystem1.stepSimByNSteps(200);
+                    ODEDataPoint dp2 = currentSystem2.stepSimByNSteps(200);
+                    ODEDataPoint dp = new ODEDataPoint(dp1.getT(), dp1.getY() + dp2.getY());
+                    clearCanvas(mainCanvas);
+                    graph.drawNextFrame(dp);
+                };
                 break;
+
             //TODO frequencies higher than 10Hz produce nonsense figures, change to frequency slider?
             case ("Lissajous Figures"):
                 try {
@@ -214,6 +267,21 @@ public class FxController implements Initializable {
             currentAnimation.setCycleCount(Timeline.INDEFINITE);
             currentAnimation.play();
         }
+    }
+
+    private Clip playAudio(ArrayList<ODEDataPoint> function, double maxVolume) throws LineUnavailableException, IOException {
+        AudioInputStream asmr = new AudioInputStream(new FunctionalInputStream(function, maxVolume),
+                new AudioFormat(samplingRate, 16, 1, true, false),
+                numberOfSamples);
+        Clip clang = AudioSystem.getClip();
+        try {
+            clang.open(asmr);
+            clang.loop(Clip.LOOP_CONTINUOUSLY);
+            clang.start();
+        } catch (LineUnavailableException e)    {
+
+        }
+        return clang;
     }
 
     private void redrawSpringMass(ODEDataPoint dp, double maxDisplacement) {
@@ -322,7 +390,11 @@ public class FxController implements Initializable {
                 imgEqn.setImage(new Image(getClass().getResourceAsStream("resources/ode_springmass_damped.png")));
                 break;
             case ("Beats demo"):
-                System.out.println("By Dr. Hefner");
+                availableInputFields.add(freq1InputField);
+                availableInputFields.add(freq2InputField);
+                availableInputFields.add(phaseInputField);
+                canvasesPane.setDividerPosition(0,1.0);
+                canvasesPane.setDisable(true);
                 break;
             case ("Lissajous Figures"):
                 availableInputFields.add(freq1InputField);
@@ -340,6 +412,7 @@ public class FxController implements Initializable {
     /**Sets the imagebox, textfields and playbutton back to visible
      * These controls must be setup properly first before calling this method*/
     private void showControls() {
+
         imgEqn.setManaged(true);
         imgEqn.setVisible(true);
 
@@ -354,6 +427,9 @@ public class FxController implements Initializable {
     /**Sets the imagebox, textfields and playbutton to invisible
      * clears the individual textfields and the set of available textfields*/
     private void hideControls() {
+        if (systemAudioClip != null)    {
+            systemAudioClip.stop();
+        }
         imgEqn.setManaged(false);
         imgEqn.setVisible(false);
 

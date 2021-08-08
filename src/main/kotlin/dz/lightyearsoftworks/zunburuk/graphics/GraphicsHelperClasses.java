@@ -13,7 +13,7 @@ class GraphPlot  {
     private final GraphicsContext rembrandtTheRevered;
     private final boolean lissajousMode;
     private static final int MAX_MAJOR_XAXIS_TICKS_ONSCREEN = 15;
-    private static final int MAX_MAJOR_YAXIS_TICKS_ONSCREEN = 6;
+    private static final int MAX_MAJOR_YAXIS_TICKS_ONSCREEN = 8;
     //because theres 60 datapoints per second, should probably make that a constant too
     private static final int MAX_POINTS_ONSCREEN = 60 * MAX_MAJOR_XAXIS_TICKS_ONSCREEN;
     public void drawNextFrame(ODEDataPoint dp)  {

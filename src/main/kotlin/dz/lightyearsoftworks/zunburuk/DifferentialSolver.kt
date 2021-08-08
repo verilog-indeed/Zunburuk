@@ -10,6 +10,8 @@ import kotlin.math.sin
  * and a given start time and time-step (h), the next state of the system (n+1) can be obtained with nextDataPoint()*/
 class DifferentialSolver(eqnType: DifferentialEquationType, initialConditions: EquationParameters,
                          startTime: Double, timeStep: Double)  {
+    private val start = startTime
+    private val initCond = initialConditions
     private var Xi = startTime
     private var Yi = initialConditions.Y_NAUGHT
     private var Pi = initialConditions.Y_PRIME_NAUGHT
@@ -64,6 +66,16 @@ class DifferentialSolver(eqnType: DifferentialEquationType, initialConditions: E
             advanceOneTimeStep()
         }
         return nextDataPoint()
+    }
+
+    fun reset() {
+        Xi = start
+        Yi = initCond.Y_NAUGHT
+        Pi = initCond.Y_PRIME_NAUGHT
+        k1 = 0.0
+        k2 = 0.0
+        u1 = 0.0
+        u2 = 0.0
     }
 }
 
