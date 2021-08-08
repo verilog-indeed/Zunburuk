@@ -301,6 +301,7 @@ public class FxController implements Initializable {
                 availableInputFields.add(lengthInputField);
                 availableInputFields.add(maxAngleInputField);
                 canvasesPane.setDividerPosition(0,0.65);
+                canvasesPane.setDisable(false);
                 imgEqn.setImage(new Image(getClass().getResourceAsStream("resources/ode_pendulum.png")));
                 break;
             case ("Mass on a Vertical Spring"):
@@ -308,6 +309,7 @@ public class FxController implements Initializable {
                 availableInputFields.add(massInputField);
                 availableInputFields.add(maxDisplacementInputField);
                 canvasesPane.setDividerPosition(0,0.65);
+                canvasesPane.setDisable(false);
                 imgEqn.setImage(new Image(getClass().getResourceAsStream("resources/ode_springmass.png")));
                 break;
             case ("Damped Mass on a Vertical Spring"):
@@ -316,6 +318,7 @@ public class FxController implements Initializable {
                 availableInputFields.add(maxDisplacementInputField);
                 availableInputFields.add(dampingFactorInputField);
                 canvasesPane.setDividerPosition(0,0.65);
+                canvasesPane.setDisable(false);
                 imgEqn.setImage(new Image(getClass().getResourceAsStream("resources/ode_springmass_damped.png")));
                 break;
             case ("Beats demo"):
@@ -326,6 +329,7 @@ public class FxController implements Initializable {
                 availableInputFields.add(freq2InputField);
                 availableInputFields.add(phaseInputField);
                 canvasesPane.setDividerPosition(0,1.0);
+                canvasesPane.setDisable(true);
                 imgEqn.setImage(new Image(getClass().getResourceAsStream("resources/lissajous_param.png")));
                 break;
             default:

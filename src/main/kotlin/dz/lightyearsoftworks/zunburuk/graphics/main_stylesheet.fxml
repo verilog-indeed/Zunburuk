@@ -73,7 +73,7 @@
                </font></Button>
          </children>
       </VBox>
-      <SplitPane fx:id="canvasesPane" dividerPositions="0.65" orientation="VERTICAL" prefHeight="598.0" prefWidth="178.0">
+      <SplitPane fx:id="canvasesPane" dividerPositions="0.65" orientation="VERTICAL" disable="true" prefHeight="598.0" prefWidth="178.0">
         <items>
             <Pane prefHeight="200.0" prefWidth="200.0">
                <children>
