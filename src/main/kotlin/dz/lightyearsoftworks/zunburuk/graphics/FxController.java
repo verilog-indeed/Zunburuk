@@ -51,7 +51,7 @@ public class FxController implements Initializable {
     private final ArrayList<TextField> availableInputFields = new ArrayList<>();
     private GraphicsContext rembrandtTheRevered;
     private final float samplingRate = 48000.0F;
-    private final int numberOfSamples = 48000;
+    private final int numberOfSamples = (int)samplingRate * 3;
     private Clip systemAudioClip;
 
 
@@ -200,14 +200,13 @@ public class FxController implements Initializable {
                         0.0, 1.0 / (samplingRate * 200.0));
 
                 ArrayList<ODEDataPoint> function = new ArrayList<>();
+                //TODO the graphing is broken
                 for (int i = 0; i < numberOfSamples; i++)   {
                     ODEDataPoint dp1 = currentSystem1.stepSimByNSteps(200);
                     ODEDataPoint dp2 = currentSystem2.stepSimByNSteps(200);
                     ODEDataPoint dp = new ODEDataPoint(dp1.getT(), dp1.getY() + dp2.getY());
                     function.add(dp);
                 }
-                currentSystem1.reset();
-                currentSystem2.reset();
                 try {
                     systemAudioClip = playAudio(function, 2 * maxAmplitude);
                 } catch (LineUnavailableException e) {
@@ -215,10 +214,27 @@ public class FxController implements Initializable {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+
+                angFreq1 = angFreq1 / 10.0;
+                angFreq2 = angFreq2 / 10.0;
+                maxAmplitude = 1.0;
+                DifferentialSolver decoySystem1 = new DifferentialSolver(DifferentialEquationType.ORDER2_UNDAMPED,
+                        new EquationParameters(maxAmplitude,
+                                0,
+                                angFreq1 * angFreq1,
+                                0.0, 0),
+                        0.0, 1.0 / 60000.0);
+                DifferentialSolver decoySystem2 = new DifferentialSolver(DifferentialEquationType.ORDER2_UNDAMPED,
+                        new EquationParameters(maxAmplitude * cos(phi),
+                                -maxAmplitude * angFreq2 * sin(phi),
+                                angFreq2 * angFreq2,
+                                0.0, 0),
+                        0.0, 1.0 / 60000.0);
+
                 graph = new GraphPlot(picassoThePainter, false);
                 simulationSteppingHandler = event -> {
-                    ODEDataPoint dp1 = currentSystem1.stepSimByNSteps(200);
-                    ODEDataPoint dp2 = currentSystem2.stepSimByNSteps(200);
+                    ODEDataPoint dp1 = decoySystem1.stepSimByNSteps(1000);
+                    ODEDataPoint dp2 = decoySystem2.stepSimByNSteps(1000);
                     ODEDataPoint dp = new ODEDataPoint(dp1.getT(), dp1.getY() + dp2.getY());
                     clearCanvas(mainCanvas);
                     graph.drawNextFrame(dp);
@@ -395,6 +411,7 @@ public class FxController implements Initializable {
                 availableInputFields.add(phaseInputField);
                 canvasesPane.setDividerPosition(0,1.0);
                 canvasesPane.setDisable(true);
+                imgEqn.setImage(new Image(getClass().getResourceAsStream("resources/lissajous_param.png")));
                 break;
             case ("Lissajous Figures"):
                 availableInputFields.add(freq1InputField);
