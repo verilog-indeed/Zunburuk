@@ -13,6 +13,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -44,9 +45,12 @@ public class FxController implements Initializable {
     public TextField freq1InputField;
     public TextField freq2InputField;
     public TextField phaseInputField;
+    public Canvas secondaryCanvas;
+    public SplitPane canvasesPane;
     private GraphicsContext picassoThePainter;
     private Timeline currentAnimation;
     private final ArrayList<TextField> availableInputFields = new ArrayList<>();
+    private GraphicsContext rembrandtTheRevered;
 
 
     public void onPlayButtonPress(ActionEvent actionEvent) {
@@ -57,6 +61,7 @@ public class FxController implements Initializable {
         }
 
         DifferentialSolver currentSystem1, currentSystem2;
+        GraphPlot graph;
         EventHandler<ActionEvent> simulationSteppingHandler;
         double maxAngle, gravity, tetherLength, maxDisplacement, springConst, mass, dampingFactor, freq1, freq2, phi;
 
@@ -86,15 +91,17 @@ public class FxController implements Initializable {
                                 gravity / tetherLength,
                                 0, 0),
                         0.0, 1.0 / 6000.0);
-
+                graph = new GraphPlot(rembrandtTheRevered, false);
                 simulationSteppingHandler = event -> {
                     //ODEDataPoint dp = currentSystem1.nextDataPoint();
                     //skip through 100 datapoints to sync up animation timestep and simulation timestep
                     //anim timestep is 1/60, sim timestep is 1/6000
                     ODEDataPoint dp = currentSystem1.stepSimByNSteps(100);
-                    clearCanvas();
+                    clearCanvas(mainCanvas);
+                    clearCanvas(secondaryCanvas);
                     redrawPendulum(dp, tetherLength);
                     redrawBase();
+                    graph.drawNextFrame(dp);
                 };
                 break;
             case ("Mass on a Vertical Spring"):
@@ -118,12 +125,15 @@ public class FxController implements Initializable {
                                 springConst / mass,
                                 0, 0),
                         0.0, 1.0 / 6000.0);
+                graph = new GraphPlot(rembrandtTheRevered, false);
 
                 simulationSteppingHandler = event -> {
                     ODEDataPoint dp = currentSystem1.stepSimByNSteps(100);
-                    clearCanvas();
+                    clearCanvas(mainCanvas);
+                    clearCanvas(secondaryCanvas);
                     redrawSpringMass(dp, maxDisplacement);
                     redrawBase();
+                    graph.drawNextFrame(dp);
                 };
                 break;
             case ("Damped Mass on a Vertical Spring"):
@@ -148,18 +158,21 @@ public class FxController implements Initializable {
                                 springConst / mass,
                                 dampingFactor / mass, 0),
                         0.0, 1.0 / 6000.0);
-
+                graph = new GraphPlot(rembrandtTheRevered, false);
                 simulationSteppingHandler = event -> {
                     ODEDataPoint dp = currentSystem1.stepSimByNSteps(100);
-                    clearCanvas();
+                    clearCanvas(mainCanvas);
+                    clearCanvas(secondaryCanvas);
                     redrawSpringMass(dp, maxDisplacement);
                     redrawBase();
+                    graph.drawNextFrame(dp);
                 };
             break;
             case ("Beats demo"):
                 System.out.println("By Dr. Hefner");
                 simulationSteppingHandler = null;
                 break;
+            //TODO frequencies higher than 10Hz produce nonsense figures, change to frequency slider?
             case ("Lissajous Figures"):
                 try {
                     freq1 = Double.parseDouble(freq1InputField.getText());
@@ -183,12 +196,12 @@ public class FxController implements Initializable {
                                 angVel2 * angVel2,
                                 0.0, 0),
                         0.0, 1.0 / 6000.0);
-                GraphPlot graph = new GraphPlot(picassoThePainter, true);
+                graph = new GraphPlot(picassoThePainter, true);
                 simulationSteppingHandler = event -> {
                     ODEDataPoint dp1 = currentSystem1.stepSimByNSteps(100);
                     ODEDataPoint dp2 = currentSystem2.stepSimByNSteps(100);
                     ODEDataPoint dp = new ODEDataPoint(dp1.getY(), dp2.getY());
-                    clearCanvas();
+                    clearCanvas(mainCanvas);
                     graph.drawNextFrame(dp);
                 };
                 break;
@@ -259,16 +272,20 @@ public class FxController implements Initializable {
         picassoThePainter.setLineWidth(1.0);
     }
 
-    private void clearCanvas() {
-        double width = mainCanvas.getWidth(); double height = mainCanvas.getHeight();
-        picassoThePainter.clearRect(0, 0, width, height);
+    private void clearCanvas(Canvas c) {
+        double width = c.getWidth(); double height = c.getHeight();
+        c.getGraphicsContext2D().clearRect(0, 0, width, height);
     }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        canvasesPane.setDividerPosition(0,1.0);
         mainCanvas.widthProperty().bind(((Pane)mainCanvas.getParent()).widthProperty());
         mainCanvas.heightProperty().bind(((Pane)mainCanvas.getParent()).heightProperty());
+        secondaryCanvas.widthProperty().bind(((Pane)secondaryCanvas.getParent()).widthProperty());
+        secondaryCanvas.heightProperty().bind(((Pane)secondaryCanvas.getParent()).heightProperty());
         picassoThePainter = mainCanvas.getGraphicsContext2D();
+        rembrandtTheRevered = secondaryCanvas.getGraphicsContext2D();
         oscillationTypeComboBox.getItems().add("Simple Pendulum");
         oscillationTypeComboBox.getItems().add("Mass on a Vertical Spring");
         oscillationTypeComboBox.getItems().add("Damped Mass on a Vertical Spring");
@@ -283,12 +300,14 @@ public class FxController implements Initializable {
                 availableInputFields.add(gravityInputField);
                 availableInputFields.add(lengthInputField);
                 availableInputFields.add(maxAngleInputField);
+                canvasesPane.setDividerPosition(0,0.65);
                 imgEqn.setImage(new Image(getClass().getResourceAsStream("resources/ode_pendulum.png")));
                 break;
             case ("Mass on a Vertical Spring"):
                 availableInputFields.add(springConstInputField);
                 availableInputFields.add(massInputField);
                 availableInputFields.add(maxDisplacementInputField);
+                canvasesPane.setDividerPosition(0,0.65);
                 imgEqn.setImage(new Image(getClass().getResourceAsStream("resources/ode_springmass.png")));
                 break;
             case ("Damped Mass on a Vertical Spring"):
@@ -296,6 +315,7 @@ public class FxController implements Initializable {
                 availableInputFields.add(massInputField);
                 availableInputFields.add(maxDisplacementInputField);
                 availableInputFields.add(dampingFactorInputField);
+                canvasesPane.setDividerPosition(0,0.65);
                 imgEqn.setImage(new Image(getClass().getResourceAsStream("resources/ode_springmass_damped.png")));
                 break;
             case ("Beats demo"):
@@ -305,6 +325,7 @@ public class FxController implements Initializable {
                 availableInputFields.add(freq1InputField);
                 availableInputFields.add(freq2InputField);
                 availableInputFields.add(phaseInputField);
+                canvasesPane.setDividerPosition(0,1.0);
                 imgEqn.setImage(new Image(getClass().getResourceAsStream("resources/lissajous_param.png")));
                 break;
             default:

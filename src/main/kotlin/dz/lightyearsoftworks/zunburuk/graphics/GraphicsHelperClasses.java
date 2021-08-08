@@ -12,7 +12,7 @@ class GraphPlot  {
     private final ArrayList<ODEDataPoint> dataSeries;
     private final GraphicsContext rembrandtTheRevered;
     private final boolean lissajousMode;
-    private static final int MAX_MAJOR_TICKS_ONSCREEN = 5;
+    private static final int MAX_MAJOR_TICKS_ONSCREEN = 15;
     //because theres 60 datapoints per second, should probably make that a constant too
     private static final int MAX_POINTS_ONSCREEN = 60 * MAX_MAJOR_TICKS_ONSCREEN;
     public void drawNextFrame(ODEDataPoint dp)  {
@@ -25,13 +25,20 @@ class GraphPlot  {
         double midX = lissajousMode? cnv.getWidth() * 0.5: 0.0;
         double midY = cnv.getHeight() * 0.5;
         double xScale = lissajousMode? 10.0 :(cnv.getWidth() / MAX_MAJOR_TICKS_ONSCREEN);
-        double yScale = lissajousMode? 10.0 : 10.0;
-        /*
-        //draws the x-axis line
-        rembrandtTheRevered.setStroke(Color.BLACK);
-        rembrandtTheRevered.setLineWidth(2.0);
-        rembrandtTheRevered.strokeLine(0.0, midY, cnv.getWidth(), midY);
-        */
+        double yScale = lissajousMode? 10.0 : 25.0;
+        if (!lissajousMode) {
+            rembrandtTheRevered.setStroke(Color.GRAY);
+            rembrandtTheRevered.setLineWidth(1.0);
+            for (int i = 1; i <= MAX_MAJOR_TICKS_ONSCREEN; i++) {
+                rembrandtTheRevered.strokeLine(i * xScale, 0.0, i * xScale, cnv.getHeight());
+                //TODO should not be drawing vertical lines like this, need to properly define how many ticks are on the y-axis
+                rembrandtTheRevered.strokeLine(0.0, i * yScale, cnv.getWidth(), i * yScale);
+            }
+            //draws the x-axis line
+            rembrandtTheRevered.setStroke(Color.BLACK);
+            rembrandtTheRevered.setLineWidth(2.0);
+            rembrandtTheRevered.strokeLine(0.0, midY, cnv.getWidth(), midY);
+        }
         rembrandtTheRevered.setStroke(Color.RED);
         rembrandtTheRevered.setLineWidth(3.0);
         Iterator<ODEDataPoint> it = dataSeries.iterator();

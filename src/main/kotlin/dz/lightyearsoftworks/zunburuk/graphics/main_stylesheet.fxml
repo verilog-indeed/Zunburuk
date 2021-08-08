@@ -15,69 +15,74 @@
       <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="25">
          <children>
             <ComboBox fx:id="oscillationTypeComboBox" onAction="#onSimTypeSelection" prefHeight="25.0" prefWidth="325.0" promptText="Select oscillator type..." style="-fx-border-width: 10;" />
-            <ImageView fx:id="imgEqn" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" visible="false" managed="false">
+            <ImageView fx:id="imgEqn" fitHeight="150.0" fitWidth="200.0" managed="false" pickOnBounds="true" preserveRatio="true" visible="false">
             </ImageView>
-            <TextField fx:id="gravityInputField" alignment="CENTER" onKeyTyped="#onInputFieldChanged" prefHeight="25.0" prefWidth="597.0" promptText="Enter a value for g..." visible="false" managed="false">
+            <TextField fx:id="gravityInputField" alignment="CENTER" managed="false" onKeyTyped="#onInputFieldChanged" prefHeight="25.0" prefWidth="597.0" promptText="Enter a value for g..." visible="false">
                <font>
                   <Font size="18.0" />
                </font>
             </TextField>
-            <TextField fx:id="lengthInputField" alignment="CENTER" onKeyTyped="#onInputFieldChanged" prefHeight="25.0" prefWidth="589.0" promptText="Enter a value for length L..." visible="false" managed="false">
+            <TextField fx:id="lengthInputField" alignment="CENTER" managed="false" onKeyTyped="#onInputFieldChanged" prefHeight="25.0" prefWidth="589.0" promptText="Enter a value for length L..." visible="false">
                <font>
                   <Font size="18.0" />
                </font>
             </TextField>
-            <TextField fx:id="maxAngleInputField" alignment="CENTER" onKeyTyped="#onInputFieldChanged" prefHeight="25.0" prefWidth="589.0" promptText="Enter a value for maximum angle displacement in degrees..." visible="false" managed="false">
+            <TextField fx:id="maxAngleInputField" alignment="CENTER" managed="false" onKeyTyped="#onInputFieldChanged" prefHeight="25.0" prefWidth="589.0" promptText="Enter a value for maximum angle displacement in degrees..." visible="false">
                <font>
                   <Font size="18.0" />
                </font>
             </TextField>
-             <TextField fx:id="springConstInputField" alignment="CENTER" onKeyTyped="#onInputFieldChanged" prefHeight="25.0" prefWidth="597.0" promptText="Enter a value for the spring constant K..." visible="false" managed="false">
+             <TextField fx:id="springConstInputField" alignment="CENTER" managed="false" onKeyTyped="#onInputFieldChanged" prefHeight="25.0" prefWidth="597.0" promptText="Enter a value for the spring constant K..." visible="false">
                  <font>
                      <Font size="18.0" />
                  </font>
              </TextField>
-             <TextField fx:id="massInputField" alignment="CENTER" onKeyTyped="#onInputFieldChanged" prefHeight="25.0" prefWidth="589.0" promptText="Enter a value for mass M..." visible="false" managed="false">
+             <TextField fx:id="massInputField" alignment="CENTER" managed="false" onKeyTyped="#onInputFieldChanged" prefHeight="25.0" prefWidth="589.0" promptText="Enter a value for mass M..." visible="false">
                  <font>
                      <Font size="18.0" />
                  </font>
              </TextField>
-             <TextField fx:id="maxDisplacementInputField" alignment="CENTER" onKeyTyped="#onInputFieldChanged" prefHeight="25.0" prefWidth="589.0" promptText="Enter a value for maximum displacement..." visible="false" managed="false">
+             <TextField fx:id="maxDisplacementInputField" alignment="CENTER" managed="false" onKeyTyped="#onInputFieldChanged" prefHeight="25.0" prefWidth="589.0" promptText="Enter a value for maximum displacement..." visible="false">
                  <font>
                      <Font size="18.0" />
                  </font>
              </TextField>
-             <TextField fx:id="dampingFactorInputField" alignment="CENTER" onKeyTyped="#onInputFieldChanged" prefHeight="25.0" prefWidth="589.0" promptText="Enter a value for damping factor b..." visible="false" managed="false">
+             <TextField fx:id="dampingFactorInputField" alignment="CENTER" managed="false" onKeyTyped="#onInputFieldChanged" prefHeight="25.0" prefWidth="589.0" promptText="Enter a value for damping factor b..." visible="false">
                  <font>
                      <Font size="18.0" />
                  </font>
              </TextField>
-             <TextField fx:id="freq1InputField" alignment="CENTER" onKeyTyped="#onInputFieldChanged" prefHeight="25.0" prefWidth="589.0" promptText="Enter a value for first frequency..." visible="false" managed="false">
+             <TextField fx:id="freq1InputField" alignment="CENTER" managed="false" onKeyTyped="#onInputFieldChanged" prefHeight="25.0" prefWidth="589.0" promptText="Enter a value for first frequency..." visible="false">
                  <font>
                      <Font size="18.0" />
                  </font>
              </TextField>
-             <TextField fx:id="freq2InputField" alignment="CENTER" onKeyTyped="#onInputFieldChanged" prefHeight="25.0" prefWidth="589.0" promptText="Enter a value for second frequency..." visible="false" managed="false">
+             <TextField fx:id="freq2InputField" alignment="CENTER" managed="false" onKeyTyped="#onInputFieldChanged" prefHeight="25.0" prefWidth="589.0" promptText="Enter a value for second frequency..." visible="false">
                  <font>
                      <Font size="18.0" />
                  </font>
              </TextField>
-             <TextField fx:id="phaseInputField" alignment="CENTER" onKeyTyped="#onInputFieldChanged" prefHeight="25.0" prefWidth="589.0" promptText="Enter a value for phase shift phi in degrees..." visible="false" managed="false">
+             <TextField fx:id="phaseInputField" alignment="CENTER" managed="false" onKeyTyped="#onInputFieldChanged" prefHeight="25.0" prefWidth="589.0" promptText="Enter a value for phase shift phi in degrees..." visible="false">
                  <font>
                      <Font size="18.0" />
                  </font>
              </TextField>
-            <Button fx:id="playButton" mnemonicParsing="false" onAction="#onPlayButtonPress" text="Play!" visible="false" managed="false">
+            <Button fx:id="playButton" managed="false" mnemonicParsing="false" onAction="#onPlayButtonPress" text="Play!" visible="false">
                <font>
                   <Font size="22.0" />
                </font></Button>
          </children>
       </VBox>
-      <SplitPane orientation="VERTICAL" prefHeight="398.0" prefWidth="590.0">
+      <SplitPane fx:id="canvasesPane" dividerPositions="0.65" orientation="VERTICAL" prefHeight="598.0" prefWidth="178.0">
         <items>
             <Pane prefHeight="200.0" prefWidth="200.0">
                <children>
                   <Canvas fx:id="mainCanvas" />
+               </children>
+            </Pane>
+            <Pane prefHeight="200.0" prefWidth="200.0">
+               <children>
+                  <Canvas fx:id="secondaryCanvas" height="600.0" width="661.0" />
                </children>
             </Pane>
         </items>
