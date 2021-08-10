@@ -189,10 +189,10 @@ public class FxController implements Initializable {
                 //should this reaaaaally be its own thread? it breaks things if you autoclick-spam the play button
                 //Thread audioGenerationWorker = new Thread(() -> {
                     ArrayList<ODEDataPoint> function = new ArrayList<>();
-                    double Xi = 0.0;
+                    AtomicReference<Double> Xi = new AtomicReference<>(0.0);
                     for (int i = 0; i < numberOfSamples; i++) {
-                        ODEDataPoint dp = new ODEDataPoint(Xi, cos(angFreq1 * Xi) + cos(angFreq2 * Xi + phi));
-                        Xi += 1.0 / samplingRate;
+                        ODEDataPoint dp = new ODEDataPoint(Xi.get(), cos(angFreq1 * Xi.get()) + cos(angFreq2 * Xi.get() + phi));
+                        Xi.updateAndGet(v -> new Double((double) (v + 1.0 / samplingRate)));
                         function.add(dp);
                     }
                     try {
@@ -207,28 +207,9 @@ public class FxController implements Initializable {
 
                 //TODO might be worth having each oscillator with an independent amplitude?
                 double maxAmplitude = 1.0;
-                /*
-                DifferentialSolver decoySystem1 = new DifferentialSolver(DifferentialEquationType.ORDER2_UNDAMPED,
-                        new EquationParameters(maxAmplitude,
-                                0,
-                                decFreq1 * decFreq1,
-                                0.0, 0),
-                        0.0, 1.0 / 600000.0);
-                DifferentialSolver decoySystem2 = new DifferentialSolver(DifferentialEquationType.ORDER2_UNDAMPED,
-                        new EquationParameters(maxAmplitude * cos(phi),
-                                -maxAmplitude * angFreq2 * sin(phi),
-                                decFreq1 * decFreq2,
-                                0.0, 0),
-                        0.0, 1.0 / 600000.0);
-                */
                 graph = new GraphPlot(picassoThePainter, false, 4, 8);
                 AtomicReference<Double> finalXi = new AtomicReference<>(0.0);
                 simulationSteppingHandler = event -> {
-                    /*
-                    ODEDataPoint dp1 = decoySystem1.stepSimByNSteps(10000);
-                    ODEDataPoint dp2 = decoySystem2.stepSimByNSteps(10000);
-                    ODEDataPoint dp = new ODEDataPoint(dp1.getT(), dp1.getY() + dp2.getY());
-                    */
                     ODEDataPoint dp = new ODEDataPoint(finalXi.get(), cos(angFreq1 * finalXi.get()) + cos(angFreq2 * finalXi.get() + phi));
                     finalXi.updateAndGet(v -> (double) (v + 1.0 / 60.0));
                     clearCanvas(mainCanvas);
