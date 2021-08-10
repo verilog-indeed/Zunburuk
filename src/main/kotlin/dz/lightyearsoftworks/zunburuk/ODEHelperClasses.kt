@@ -12,13 +12,12 @@ import java.io.InputStream
  * */
 
 //Y_FACTOR also represents the factor of the sin(y) term (y" + aSin(y) = c)
-//in the ODE for a pendulum system, not sure if i should be doing this though..
 data class EquationParameters(val Y_NAUGHT: Double, val Y_PRIME_NAUGHT: Double,
                               val Y_FACTOR: Double, val Y_PRIME_FACTOR: Double,
                               val RHS_constant: Double)
 
 /**Represents a single preimage/image pair (t, F(t))*/
-data class ODEDataPoint(val t: Double, val y: Double)  //is this overkill?
+data class ODEDataPoint(val t: Double, val y: Double)
 
 /**Defines possible types of ordinary differential equations that can be solved*/
 enum class DifferentialEquationType {
@@ -51,6 +50,7 @@ class FunctionalInputStream(function: ArrayList<ODEDataPoint>, amplitude: Double
     init {
         pcmValues = IntArray(function.size)
         //linearly normalize given values where 100% amplitude is 32767 (0x7FFF)
+        //32767 = 2^(16 - 1) max magnitude in a 16bit two's complement number
         for (i in pcmValues.indices) {
             pcmValues[i] = kotlin.math.floor(function[i].y * 32767  / amplitude).toInt()
         }
