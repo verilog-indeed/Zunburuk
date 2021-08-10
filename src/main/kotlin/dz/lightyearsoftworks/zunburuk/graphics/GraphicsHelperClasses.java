@@ -12,10 +12,11 @@ class GraphPlot  {
     private final ArrayList<ODEDataPoint> dataSeries;
     private final GraphicsContext rembrandtTheRevered;
     private final boolean lissajousMode;
-    private static final int MAX_MAJOR_XAXIS_TICKS_ONSCREEN = 20;
-    private static final int MAX_MAJOR_YAXIS_TICKS_ONSCREEN = 8;
+    //default 20?
+    private final int MAX_MAJOR_XAXIS_TICKS_ONSCREEN;
+    private final int MAX_MAJOR_YAXIS_TICKS_ONSCREEN;
     //because theres 60 datapoints per second, should probably make that a constant too
-    private static final int MAX_POINTS_ONSCREEN = 60 * MAX_MAJOR_XAXIS_TICKS_ONSCREEN;
+    private final int MAX_POINTS_ONSCREEN;
     public void drawNextFrame(ODEDataPoint dp)  {
         dataSeries.add(dp);
         if (!lissajousMode && dataSeries.size() > MAX_POINTS_ONSCREEN)   {
@@ -68,9 +69,12 @@ class GraphPlot  {
 
     }
 
-    public GraphPlot(GraphicsContext g, boolean isLissajous)   {
+    public GraphPlot(GraphicsContext g, boolean isLissajous, int xTicks, int yTicks)   {
         dataSeries = new ArrayList<>();
         rembrandtTheRevered = g;
         lissajousMode = isLissajous;
+        MAX_MAJOR_XAXIS_TICKS_ONSCREEN = xTicks;
+        MAX_MAJOR_YAXIS_TICKS_ONSCREEN = yTicks;
+        MAX_POINTS_ONSCREEN = 60 * MAX_MAJOR_XAXIS_TICKS_ONSCREEN;
     }
 }

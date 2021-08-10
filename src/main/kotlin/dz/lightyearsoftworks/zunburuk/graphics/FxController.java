@@ -98,7 +98,7 @@ public class FxController implements Initializable {
                                 gravity / tetherLength,
                                 0, 0),
                         0.0, 1.0 / 6000.0);
-                graph = new GraphPlot(rembrandtTheRevered, false);
+                graph = new GraphPlot(rembrandtTheRevered, false, 20, 8);
                 simulationSteppingHandler = event -> {
                     //skip through 100 datapoints to sync up animation timestep and simulation timestep
                     //anim timestep is 1/60, sim timestep is 1/6000
@@ -131,7 +131,7 @@ public class FxController implements Initializable {
                                 springConst / mass,
                                 0, 0),
                         0.0, 1.0 / 6000.0);
-                graph = new GraphPlot(rembrandtTheRevered, false);
+                graph = new GraphPlot(rembrandtTheRevered, false, 20, 8);
 
                 simulationSteppingHandler = event -> {
                     ODEDataPoint dp = currentSystem1.stepSimByNSteps(100);
@@ -164,7 +164,7 @@ public class FxController implements Initializable {
                                 springConst / mass,
                                 dampingFactor / mass, 0),
                         0.0, 1.0 / 6000.0);
-                graph = new GraphPlot(rembrandtTheRevered, false);
+                graph = new GraphPlot(rembrandtTheRevered, false, 20, 8);
                 simulationSteppingHandler = event -> {
                     ODEDataPoint dp = currentSystem1.stepSimByNSteps(100);
                     clearCanvas(mainCanvas);
@@ -186,16 +186,11 @@ public class FxController implements Initializable {
                 double angFreq2 = 2.0 * Math.PI * freq2;
                 double maxAudioAmplitude = 5.0;
 
-
-                Thread audioGenerationWorker = new Thread(() -> {
+                //should this reaaaaally be its own thread? it breaks things if you autoclick-spam the play button
+                //Thread audioGenerationWorker = new Thread(() -> {
                     ArrayList<ODEDataPoint> function = new ArrayList<>();
                     double Xi = 0.0;
                     for (int i = 0; i < numberOfSamples; i++) {
-                        /*
-                        ODEDataPoint dp1 = currentSystem1.stepSimByNSteps(2000);
-                        ODEDataPoint dp2 = currentSystem2.stepSimByNSteps(2000);
-                        ODEDataPoint dp = new ODEDataPoint(dp1.getT(), dp1.getY() + dp2.getY());
-                        */
                         ODEDataPoint dp = new ODEDataPoint(Xi, cos(angFreq1 * Xi) + cos(angFreq2 * Xi + phi));
                         Xi += 1.0 / samplingRate;
                         function.add(dp);
@@ -207,45 +202,35 @@ public class FxController implements Initializable {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                });
-                audioGenerationWorker.start();
+                //});
+                //audioGenerationWorker.start();
 
                 //TODO might be worth having each oscillator with an independent amplitude?
-                /*
-                currentSystem1 = new DifferentialSolver(DifferentialEquationType.ORDER2_UNDAMPED,
-                        new EquationParameters(maxAudioAmplitude,
-                                0,
-                                angFreq1 * angFreq1,
-                                0.0, 0),
-                        0.0, 1.0 / (samplingRate * 2000.0));
-                currentSystem2 = new DifferentialSolver(DifferentialEquationType.ORDER2_UNDAMPED,
-                        new EquationParameters(maxAudioAmplitude * cos(phi),
-                                -maxAudioAmplitude * angFreq2 * sin(phi),
-                                angFreq2 * angFreq2,
-                                0.0, 0),
-                        0.0, 1.0 / (samplingRate * 2000.0));
-                 */
-                double decFreq1 = angFreq1 / 10.0;
-                double decFreq2 = angFreq2 / 10.0;
                 double maxAmplitude = 1.0;
+                /*
                 DifferentialSolver decoySystem1 = new DifferentialSolver(DifferentialEquationType.ORDER2_UNDAMPED,
                         new EquationParameters(maxAmplitude,
                                 0,
                                 decFreq1 * decFreq1,
                                 0.0, 0),
-                        0.0, 1.0 / 60000.0);
+                        0.0, 1.0 / 600000.0);
                 DifferentialSolver decoySystem2 = new DifferentialSolver(DifferentialEquationType.ORDER2_UNDAMPED,
                         new EquationParameters(maxAmplitude * cos(phi),
                                 -maxAmplitude * angFreq2 * sin(phi),
                                 decFreq1 * decFreq2,
                                 0.0, 0),
-                        0.0, 1.0 / 60000.0);
-
-                graph = new GraphPlot(picassoThePainter, false);
+                        0.0, 1.0 / 600000.0);
+                */
+                graph = new GraphPlot(picassoThePainter, false, 4, 8);
+                AtomicReference<Double> finalXi = new AtomicReference<>(0.0);
                 simulationSteppingHandler = event -> {
-                    ODEDataPoint dp1 = decoySystem1.stepSimByNSteps(1000);
-                    ODEDataPoint dp2 = decoySystem2.stepSimByNSteps(1000);
+                    /*
+                    ODEDataPoint dp1 = decoySystem1.stepSimByNSteps(10000);
+                    ODEDataPoint dp2 = decoySystem2.stepSimByNSteps(10000);
                     ODEDataPoint dp = new ODEDataPoint(dp1.getT(), dp1.getY() + dp2.getY());
+                    */
+                    ODEDataPoint dp = new ODEDataPoint(finalXi.get(), cos(angFreq1 * finalXi.get()) + cos(angFreq2 * finalXi.get() + phi));
+                    finalXi.updateAndGet(v -> (double) (v + 1.0 / 60.0));
                     clearCanvas(mainCanvas);
                     graph.drawNextFrame(dp);
                 };
@@ -262,7 +247,7 @@ public class FxController implements Initializable {
                 }
                 double angVel1 = 2.0 * Math.PI * freq1;
                 double angVel2 = 2.0 * Math.PI * freq2;
-                double amplitude = 10.0;
+                double amplitude = 15.0;
                 currentSystem1 = new DifferentialSolver(DifferentialEquationType.ORDER2_UNDAMPED,
                         new EquationParameters(amplitude,
                                 0,
@@ -275,7 +260,7 @@ public class FxController implements Initializable {
                                 angVel2 * angVel2,
                                 0.0, 0),
                         0.0, 1.0 / 6000.0);
-                graph = new GraphPlot(picassoThePainter, true);
+                graph = new GraphPlot(picassoThePainter, true, 20, 8);
                 simulationSteppingHandler = event -> {
                     ODEDataPoint dp1 = currentSystem1.stepSimByNSteps(100);
                     ODEDataPoint dp2 = currentSystem2.stepSimByNSteps(100);
@@ -305,7 +290,7 @@ public class FxController implements Initializable {
             clang.loop(Clip.LOOP_CONTINUOUSLY);
             clang.start();
         } catch (LineUnavailableException ignored)    {
-
+            //might be a problem if you spam the play button with an autoclicker? didnt break for me ¯\_(ツ)_/¯
         }
         return clang;
     }
@@ -423,7 +408,7 @@ public class FxController implements Initializable {
                 availableInputFields.add(phaseInputField);
                 canvasesPane.setDividerPosition(0,1.0);
                 canvasesPane.setDisable(true);
-                imgEqn.setImage(new Image(getClass().getResourceAsStream("resources/lissajous_param.png")));
+                imgEqn.setImage(new Image(getClass().getResourceAsStream("resources/beats_param.png")));
                 break;
             case ("Lissajous Figures"):
                 availableInputFields.add(freq1InputField);
