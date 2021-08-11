@@ -1,6 +1,7 @@
 package dz.lightyearsoftworks.zunburuk.graphics;
 
 import dz.lightyearsoftworks.zunburuk.*;
+
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
@@ -28,6 +29,8 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
+import static dz.lightyearsoftworks.zunburuk.graphics.GraphicsConstants.*;
+import static java.lang.System.currentTimeMillis;
 
 
 public class FxController implements Initializable {
@@ -97,7 +100,7 @@ public class FxController implements Initializable {
                                 0,
                                 gravity / tetherLength,
                                 0, 0),
-                        0.0, 1.0 / 6000.0);
+                        0.0, FRAME_TIME / 100);
                 graph = new GraphPlot(rembrandtTheRevered, false, 20, 8);
                 simulationSteppingHandler = event -> {
                     //skip through 100 datapoints to sync up animation timestep and simulation timestep
@@ -130,7 +133,7 @@ public class FxController implements Initializable {
                                 0,
                                 springConst / mass,
                                 0, 0),
-                        0.0, 1.0 / 6000.0);
+                        0.0, FRAME_TIME / 100);
                 graph = new GraphPlot(rembrandtTheRevered, false, 20, 8);
 
                 simulationSteppingHandler = event -> {
@@ -163,7 +166,7 @@ public class FxController implements Initializable {
                                 0,
                                 springConst / mass,
                                 dampingFactor / mass, 0),
-                        0.0, 1.0 / 6000.0);
+                        0.0, FRAME_TIME / 100);
                 graph = new GraphPlot(rembrandtTheRevered, false, 20, 8);
                 simulationSteppingHandler = event -> {
                     ODEDataPoint dp = currentSystem1.stepSimByNSteps(100);
@@ -186,32 +189,27 @@ public class FxController implements Initializable {
                 double angFreq2 = 2.0 * Math.PI * freq2;
                 double maxAudioAmplitude = 5.0;
 
-                //should this reaaaaally be its own thread? it breaks things if you autoclick-spam the play button
-                //Thread audioGenerationWorker = new Thread(() -> {
-                    ArrayList<ODEDataPoint> function = new ArrayList<>();
-                    AtomicReference<Double> Xi = new AtomicReference<>(0.0);
-                    for (int i = 0; i < numberOfSamples; i++) {
-                        ODEDataPoint dp = new ODEDataPoint(Xi.get(), cos(angFreq1 * Xi.get()) + cos(angFreq2 * Xi.get() + phi));
-                        Xi.updateAndGet(v -> new Double((double) (v + 1.0 / samplingRate)));
-                        function.add(dp);
-                    }
-                    try {
-                        systemAudioClip = playAudio(function, 2 * maxAudioAmplitude);
-                    } catch (LineUnavailableException e) {
-                        e.printStackTrace();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                //});
-                //audioGenerationWorker.start();
+                ArrayList<ODEDataPoint> function = new ArrayList<>();
+                AtomicReference<Double> Xi = new AtomicReference<>(0.0);
+                for (int i = 0; i < numberOfSamples; i++) {
+                    ODEDataPoint dp = new ODEDataPoint(Xi.get(), cos(angFreq1 * Xi.get()) + cos(angFreq2 * Xi.get() + phi));
+                    Xi.updateAndGet(v -> (double) (v + 1.0 / samplingRate));
+                    function.add(dp);
+                }
+                try {
+                    systemAudioClip = playAudio(function, 2 * maxAudioAmplitude);
+                } catch (LineUnavailableException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
 
                 //TODO might be worth having each oscillator with an independent amplitude?
-                double maxAmplitude = 1.0;
                 graph = new GraphPlot(picassoThePainter, false, 4, 8);
                 AtomicReference<Double> finalXi = new AtomicReference<>(0.0);
                 simulationSteppingHandler = event -> {
                     ODEDataPoint dp = new ODEDataPoint(finalXi.get(), cos(angFreq1 * finalXi.get()) + cos(angFreq2 * finalXi.get() + phi));
-                    finalXi.updateAndGet(v -> (double) (v + 1.0 / 60.0));
+                    finalXi.updateAndGet(v -> (double) (v + FRAME_TIME));
                     clearCanvas(mainCanvas);
                     graph.drawNextFrame(dp);
                 };
@@ -226,28 +224,36 @@ public class FxController implements Initializable {
                 } catch (NumberFormatException e)   {
                     throw new RuntimeException("fix your regex, 7mar");
                 }
-                double angVel1 = 2.0 * Math.PI * freq1;
-                double angVel2 = 2.0 * Math.PI * freq2;
+                double angVel1 = 1;
+                double angVel2 = 1 * freq2 / freq1;
+
                 double amplitude = 15.0;
+
                 currentSystem1 = new DifferentialSolver(DifferentialEquationType.ORDER2_UNDAMPED,
                         new EquationParameters(amplitude,
                                 0,
                                 angVel1 * angVel1,
                                 0.0, 0),
-                        0.0, 1.0 / 6000.0);
+                        0.0, FRAME_TIME / 100);
                 currentSystem2 = new DifferentialSolver(DifferentialEquationType.ORDER2_UNDAMPED,
                         new EquationParameters(amplitude * cos(phi),
                                 -amplitude * angVel2 * sin(phi),
                                 angVel2 * angVel2,
                                 0.0, 0),
-                        0.0, 1.0 / 6000.0);
-                graph = new GraphPlot(picassoThePainter, true, 20, 8);
-                simulationSteppingHandler = event -> {
+                        0.0, FRAME_TIME / 100);
+
+                ArrayList<ODEDataPoint> func = new ArrayList<>();
+                int graphSamples = (int)(100.0 / (angVel1 * FRAME_TIME));
+                for (int i = 0; i < graphSamples; i++) {
                     ODEDataPoint dp1 = currentSystem1.stepSimByNSteps(100);
                     ODEDataPoint dp2 = currentSystem2.stepSimByNSteps(100);
                     ODEDataPoint dp = new ODEDataPoint(dp1.getY(), dp2.getY());
+                    func.add(dp);
+                }
+                graph = new GraphPlot(picassoThePainter, true, 20, 8);
+                simulationSteppingHandler = event -> {
                     clearCanvas(mainCanvas);
-                    graph.drawNextFrame(dp);
+                    graph.drawGraph(func);
                 };
                 break;
             default:
@@ -255,7 +261,7 @@ public class FxController implements Initializable {
         }
 
         if (simulationSteppingHandler != null) {
-            currentAnimation = new Timeline(new KeyFrame(Duration.seconds(1 / 60.0), simulationSteppingHandler));
+            currentAnimation = new Timeline(new KeyFrame(Duration.seconds(FRAME_TIME), simulationSteppingHandler));
             currentAnimation.setCycleCount(Timeline.INDEFINITE);
             currentAnimation.play();
         }

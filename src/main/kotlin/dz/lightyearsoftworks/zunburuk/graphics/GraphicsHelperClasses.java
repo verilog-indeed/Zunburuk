@@ -1,6 +1,6 @@
 package dz.lightyearsoftworks.zunburuk.graphics;
 
-import dz.lightyearsoftworks.zunburuk.ODEDataPoint;
+import dz.lightyearsoftworks.zunburuk.*;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
@@ -8,8 +8,14 @@ import javafx.scene.paint.Color;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import static dz.lightyearsoftworks.zunburuk.graphics.GraphicsConstants.*;
+
+interface GraphicsConstants {
+    double FRAME_TIME = 1.0 / 60.0;
+}
+
 class GraphPlot  {
-    private final ArrayList<ODEDataPoint> dataSeries;
+    private ArrayList<ODEDataPoint> dataSeries;
     private final GraphicsContext rembrandtTheRevered;
     private final boolean lissajousMode;
     //default 20?
@@ -17,6 +23,12 @@ class GraphPlot  {
     private final int MAX_MAJOR_YAXIS_TICKS_ONSCREEN;
     //because theres 60 datapoints per second, should probably make that a constant too
     private final int MAX_POINTS_ONSCREEN;
+
+    public void drawGraph(ArrayList<ODEDataPoint> function)   {
+        dataSeries = function;
+        drawNextFrame(dataSeries.remove(dataSeries.size() - 1));
+    }
+
     public void drawNextFrame(ODEDataPoint dp)  {
         dataSeries.add(dp);
         if (!lissajousMode && dataSeries.size() > MAX_POINTS_ONSCREEN)   {
@@ -75,6 +87,6 @@ class GraphPlot  {
         lissajousMode = isLissajous;
         MAX_MAJOR_XAXIS_TICKS_ONSCREEN = xTicks;
         MAX_MAJOR_YAXIS_TICKS_ONSCREEN = yTicks;
-        MAX_POINTS_ONSCREEN = 60 * MAX_MAJOR_XAXIS_TICKS_ONSCREEN;
+        MAX_POINTS_ONSCREEN = (int) (MAX_MAJOR_XAXIS_TICKS_ONSCREEN / FRAME_TIME);
     }
 }
