@@ -68,8 +68,8 @@
                      <Font size="18.0" />
                  </font>
              </TextField>
-            <Slider fx:id="freq1Slider" onMouseDragged="#sliderTest"  managed="false" visible="false" majorTickUnit="1.0" max="10.0" minorTickCount="3" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="1.0" />
-            <Slider fx:id="freq2Slider" onMouseDragExited="#sliderTest" managed="false" visible="false" majorTickUnit="1.0" max="10.0" minorTickCount="3" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="1.0" />
+            <Slider fx:id="freq1Slider" onMouseDragged="#sliderTest"  managed="false" visible="false" majorTickUnit="1.0" max="10.0" minorTickCount="4" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="1.0" />
+            <Slider fx:id="freq2Slider" onMouseDragExited="#sliderTest" managed="false" visible="false" majorTickUnit="1.0" max="10.0" minorTickCount="4" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="1.0" />
             <Slider fx:id="phaseSlider" onMouseClicked="#sliderTest" managed="false" visible="false" majorTickUnit="30.0" max="180.0" minorTickCount="1" min="-180.0" showTickLabels="true" showTickMarks="true" snapToTicks="true" />
             <Button fx:id="playButton" managed="false" mnemonicParsing="false" onAction="#onPlayButtonPress" text="Play!" visible="false">
                <font>

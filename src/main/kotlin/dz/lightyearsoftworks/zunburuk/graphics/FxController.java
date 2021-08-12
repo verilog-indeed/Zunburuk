@@ -63,7 +63,6 @@ public class FxController implements Initializable {
 
 
     public void onPlayButtonPress(ActionEvent actionEvent) {
-
         for (Control t: availableControls) {
             if (t instanceof TextField && ((TextField) t).getText().equals("")) {
                 return;
@@ -243,19 +242,21 @@ public class FxController implements Initializable {
                                 -amplitude * angVel2 * sin(phi),
                                 angVel2 * angVel2,
                                 0.0, 0),
-                        0.0, FRAME_TIME / 30);
+                        0.0, FRAME_TIME / 10);
 
                 ArrayList<ODEDataPoint> func = new ArrayList<>();
                 int graphSamples = (int)(100.0 / (angVel1 * FRAME_TIME));
-                double deltaT = currentTimeMillis();
+                //double Zi = 0.0;
                 for (int i = 0; i < graphSamples; i++) {
                     ODEDataPoint dp1 = currentSystem1.nextDataPoint();
-                    ODEDataPoint dp2 = currentSystem2.stepSimByNSteps(30);
+                    ODEDataPoint dp2 = currentSystem2.stepSimByNSteps(10);
                     ODEDataPoint dp = new ODEDataPoint(dp1.getY(), dp2.getY());
+
+
+                    //ODEDataPoint dp = new ODEDataPoint(amplitude * cos(angVel1 * Zi), amplitude * cos(angVel2 * Zi + phi));
                     func.add(dp);
+                    //Zi += FRAME_TIME;
                 }
-                deltaT = currentTimeMillis() - deltaT;
-                System.out.println("for loop took " + deltaT + "ms");
 
                 graph = new GraphPlot(picassoThePainter, true, 20, 8);
                 simulationSteppingHandler = event -> {
