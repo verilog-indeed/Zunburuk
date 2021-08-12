@@ -38,8 +38,9 @@ class GraphPlot  {
         Canvas cnv = rembrandtTheRevered.getCanvas();
         double midX = lissajousMode? cnv.getWidth() * 0.5: 0.0;
         double midY = cnv.getHeight() * 0.5;
-        double xScale = lissajousMode? 10.0 :(cnv.getWidth() / MAX_MAJOR_XAXIS_TICKS_ONSCREEN);
-        double yScale = lissajousMode? 10.0 : (cnv.getHeight()) / MAX_MAJOR_YAXIS_TICKS_ONSCREEN;
+        double lesserDimension = Math.min(cnv.getHeight(), cnv.getWidth());
+        double xScale = lissajousMode? lesserDimension / 3 :(cnv.getWidth() / MAX_MAJOR_XAXIS_TICKS_ONSCREEN);
+        double yScale = lissajousMode? lesserDimension / 3 : (cnv.getHeight()) / MAX_MAJOR_YAXIS_TICKS_ONSCREEN;
         if (!lissajousMode) {
             rembrandtTheRevered.setStroke(Color.GRAY);
             rembrandtTheRevered.setLineWidth(1.0);

@@ -4,6 +4,8 @@ import dz.lightyearsoftworks.zunburuk.*;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.Initializable;
@@ -26,9 +28,8 @@ import java.util.ArrayList;
 import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static java.lang.Math.cos;
-import static java.lang.Math.sin;
 import static dz.lightyearsoftworks.zunburuk.graphics.GraphicsConstants.*;
+import static java.lang.Math.*;
 import static java.lang.System.currentTimeMillis;
 import static java.lang.System.nanoTime;
 
@@ -219,6 +220,7 @@ public class FxController implements Initializable {
 
             //TODO frequencies higher than 10Hz produce nonsense figures, change to frequency slider?
             case ("Lissajous Figures"):
+
                 try {
                     freq1 = Double.parseDouble(freq1InputField.getText());
                     freq2 = Double.parseDouble(freq2InputField.getText());
@@ -229,7 +231,7 @@ public class FxController implements Initializable {
                 double angVel1 = 1;
                 double angVel2 = 1 * freq2 / freq1;
 
-                double amplitude = 15.0;
+                double amplitude = 1.0;
 
                 currentSystem1 = new DifferentialSolver(DifferentialEquationType.ORDER2_UNDAMPED,
                         new EquationParameters(amplitude,
@@ -248,9 +250,11 @@ public class FxController implements Initializable {
                 int graphSamples = (int)(100.0 / (angVel1 * FRAME_TIME));
                 //double Zi = 0.0;
                 for (int i = 0; i < graphSamples; i++) {
+
                     ODEDataPoint dp1 = currentSystem1.nextDataPoint();
                     ODEDataPoint dp2 = currentSystem2.stepSimByNSteps(10);
                     ODEDataPoint dp = new ODEDataPoint(dp1.getY(), dp2.getY());
+
 
 
                     //ODEDataPoint dp = new ODEDataPoint(amplitude * cos(angVel1 * Zi), amplitude * cos(angVel2 * Zi + phi));
@@ -262,6 +266,7 @@ public class FxController implements Initializable {
                 simulationSteppingHandler = event -> {
                     clearCanvas(mainCanvas);
                     graph.drawGraph(func);
+                    sliderListener(null);
                 };
                 break;
             default:
@@ -275,8 +280,11 @@ public class FxController implements Initializable {
         }
     }
 
-    public void sliderTest(MouseEvent actionEvent) {
-        System.out.println(currentTimeMillis());
+    public void sliderListener(MouseEvent actionEvent) {
+        freq1InputField.setText(String.valueOf(freq1Slider.getValue()));
+        freq2InputField.setText(String.valueOf(freq2Slider.getValue()));
+        phaseInputField.setText(String.valueOf(phaseSlider.getValue()));
+        onPlayButtonPress(null);
     }
 
     private Clip playAudio(ArrayList<ODEDataPoint> function, double maxVolume) throws LineUnavailableException, IOException {
@@ -366,6 +374,27 @@ public class FxController implements Initializable {
         secondaryCanvas.heightProperty().bind(((Pane)secondaryCanvas.getParent()).heightProperty());
         picassoThePainter = mainCanvas.getGraphicsContext2D();
         rembrandtTheRevered = secondaryCanvas.getGraphicsContext2D();
+        /*
+        freq1Slider.valueProperty().addListener((obs, oldVal, newVal) -> {
+            if (abs(newVal.doubleValue() - oldVal.doubleValue()) < 0.01)   {
+                return;
+            }
+            sliderListener(null);
+        });
+        freq2Slider.valueProperty().addListener((obs, oldVal, newVal) -> {
+            if ((int)(newVal.doubleValue() * 100) % 25 != 0)   {
+                return;
+            }
+            System.out.println("F around and find out");
+            sliderListener(null);
+        });
+        phaseSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
+            if (abs(newVal.doubleValue() - oldVal.doubleValue()) < 0.01)   {
+                return;
+            }
+            sliderListener(null);
+        });
+        */
         oscillationTypeComboBox.getItems().add("Simple Pendulum");
         oscillationTypeComboBox.getItems().add("Mass on a Vertical Spring");
         oscillationTypeComboBox.getItems().add("Damped Mass on a Vertical Spring");
