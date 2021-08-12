@@ -3,13 +3,13 @@
 <?import javafx.scene.canvas.Canvas?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Slider?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
-
 
 <SplitPane dividerPositions="0.35" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="1024.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="dz.lightyearsoftworks.zunburuk.graphics.FxController">
     <items>
@@ -68,13 +68,16 @@
                      <Font size="18.0" />
                  </font>
              </TextField>
+            <Slider fx:id="freq1Slider" onMouseDragged="#sliderTest"  managed="false" visible="false" majorTickUnit="1.0" max="10.0" minorTickCount="3" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="1.0" />
+            <Slider fx:id="freq2Slider" onMouseDragExited="#sliderTest" managed="false" visible="false" majorTickUnit="1.0" max="10.0" minorTickCount="3" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="1.0" />
+            <Slider fx:id="phaseSlider" onMouseClicked="#sliderTest" managed="false" visible="false" majorTickUnit="30.0" max="180.0" minorTickCount="1" min="-180.0" showTickLabels="true" showTickMarks="true" snapToTicks="true" />
             <Button fx:id="playButton" managed="false" mnemonicParsing="false" onAction="#onPlayButtonPress" text="Play!" visible="false">
                <font>
                   <Font size="22.0" />
                </font></Button>
          </children>
       </VBox>
-      <SplitPane fx:id="canvasesPane" dividerPositions="0.65" orientation="VERTICAL" disable="true" prefHeight="598.0" prefWidth="178.0">
+      <SplitPane fx:id="canvasesPane" disable="true" dividerPositions="0.65" orientation="VERTICAL" prefHeight="598.0" prefWidth="178.0">
         <items>
             <Pane prefHeight="200.0" prefWidth="200.0">
                <children>

@@ -61,11 +61,13 @@ class DifferentialSolver(eqnType: DifferentialEquationType, initialConditions: E
     }
 
     fun stepSimByNSteps(nSteps :Int): ODEDataPoint   {
+        val result = ODEDataPoint(Xi, Yi)
+
         for (i in 1..nSteps)    {
             updateHeunFactors()
             advanceOneTimeStep()
         }
-        return nextDataPoint()
+        return result
     }
 
     fun reset() {
