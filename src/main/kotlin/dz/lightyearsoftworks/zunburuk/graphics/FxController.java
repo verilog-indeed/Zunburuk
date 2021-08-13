@@ -6,6 +6,7 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.embed.swing.SwingNode;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.Initializable;
@@ -22,6 +23,7 @@ import javafx.scene.paint.Color;
 import javafx.util.Duration;
 
 import javax.sound.sampled.*;
+import javax.swing.*;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -220,16 +222,12 @@ public class FxController implements Initializable {
 
             //TODO frequencies higher than 10Hz produce nonsense figures, change to frequency slider?
             case ("Lissajous Figures"):
+                freq1 = (int)freq1Slider.getValue();
+                freq2 = (int)freq2Slider.getValue();
+                phi = (int)phaseSlider.getValue() * Math.PI / 180;
 
-                try {
-                    freq1 = Double.parseDouble(freq1InputField.getText());
-                    freq2 = Double.parseDouble(freq2InputField.getText());
-                    phi = Double.parseDouble(phaseInputField.getText()) * (Math.PI / 180.0);
-                } catch (NumberFormatException e)   {
-                    throw new RuntimeException("fix your regex, 7mar");
-                }
                 double angVel1 = 1;
-                double angVel2 = 1 * freq2 / freq1;
+                double angVel2 = freq2 / freq1;
 
                 double amplitude = 1.0;
 
@@ -281,9 +279,6 @@ public class FxController implements Initializable {
     }
 
     public void sliderListener(MouseEvent actionEvent) {
-        freq1InputField.setText(String.valueOf(freq1Slider.getValue()));
-        freq2InputField.setText(String.valueOf(freq2Slider.getValue()));
-        phaseInputField.setText(String.valueOf(phaseSlider.getValue()));
         onPlayButtonPress(null);
     }
 
@@ -374,27 +369,7 @@ public class FxController implements Initializable {
         secondaryCanvas.heightProperty().bind(((Pane)secondaryCanvas.getParent()).heightProperty());
         picassoThePainter = mainCanvas.getGraphicsContext2D();
         rembrandtTheRevered = secondaryCanvas.getGraphicsContext2D();
-        /*
-        freq1Slider.valueProperty().addListener((obs, oldVal, newVal) -> {
-            if (abs(newVal.doubleValue() - oldVal.doubleValue()) < 0.01)   {
-                return;
-            }
-            sliderListener(null);
-        });
-        freq2Slider.valueProperty().addListener((obs, oldVal, newVal) -> {
-            if ((int)(newVal.doubleValue() * 100) % 25 != 0)   {
-                return;
-            }
-            System.out.println("F around and find out");
-            sliderListener(null);
-        });
-        phaseSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
-            if (abs(newVal.doubleValue() - oldVal.doubleValue()) < 0.01)   {
-                return;
-            }
-            sliderListener(null);
-        });
-        */
+
         oscillationTypeComboBox.getItems().add("Simple Pendulum");
         oscillationTypeComboBox.getItems().add("Mass on a Vertical Spring");
         oscillationTypeComboBox.getItems().add("Damped Mass on a Vertical Spring");
@@ -439,11 +414,6 @@ public class FxController implements Initializable {
                 imgEqn.setImage(new Image(getClass().getResourceAsStream("resources/beats_param.png")));
                 break;
             case ("Lissajous Figures"):
-
-                availableControls.add(freq1InputField);
-                availableControls.add(freq2InputField);
-                availableControls.add(phaseInputField);
-
                 availableControls.add(freq1Slider);
                 availableControls.add(freq2Slider);
                 availableControls.add(phaseSlider);

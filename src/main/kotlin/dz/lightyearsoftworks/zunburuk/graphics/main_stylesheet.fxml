@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.embed.swing.SwingNode?>
 <?import javafx.scene.canvas.Canvas?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
@@ -68,8 +69,8 @@
                      <Font size="18.0" />
                  </font>
              </TextField>
-            <Slider fx:id="freq1Slider"  blockIncrement="3.0" majorTickUnit="1.0" managed="false" max="10.0" minorTickCount="3" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="3.0" visible="false" />
-            <Slider fx:id="freq2Slider" blockIncrement="3.0" majorTickUnit="1.0" managed="false" max="10.0" minorTickCount="3" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="2.0" visible="false" />
+            <Slider fx:id="freq1Slider" blockIncrement="3.0" majorTickUnit="10.0" managed="false" max="100.0" minorTickCount="4" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="30.0" visible="false" />
+            <Slider fx:id="freq2Slider" blockIncrement="3.0" majorTickUnit="10.0" managed="false" max="100.0" minorTickCount="4" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="20.0" visible="false" />
             <Slider fx:id="phaseSlider" blockIncrement="5.0" majorTickUnit="30.0" managed="false" max="180.0" min="-180.0" minorTickCount="5" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="90" visible="false" />
             <Button fx:id="playButton" managed="false" mnemonicParsing="false" onAction="#onPlayButtonPress" text="Play!" visible="false">
                <font>
