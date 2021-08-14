@@ -4,9 +4,6 @@ import dz.lightyearsoftworks.zunburuk.*;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.embed.swing.SwingNode;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.Initializable;
@@ -17,13 +14,11 @@ import javafx.scene.control.Control;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
 
 import javax.sound.sampled.*;
-import javax.swing.*;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -32,8 +27,6 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static dz.lightyearsoftworks.zunburuk.graphics.GraphicsConstants.*;
 import static java.lang.Math.*;
-import static java.lang.System.currentTimeMillis;
-import static java.lang.System.nanoTime;
 
 
 public class FxController implements Initializable {
@@ -56,6 +49,9 @@ public class FxController implements Initializable {
     public Slider freq1Slider;
     public Slider freq2Slider;
     public Slider phaseSlider;
+    public Label freq1Label;
+    public Label freq2Label;
+    public Label phaseLabel;
     private GraphicsContext picassoThePainter;
     private Timeline currentAnimation;
     private final ArrayList<Control> availableControls = new ArrayList<>();
@@ -225,37 +221,44 @@ public class FxController implements Initializable {
                 ArrayList<ODEDataPoint> func = new ArrayList<>();
                 int graphSamples = (int)(100.0 / (FRAME_TIME));
                 graph = new GraphPlot(picassoThePainter, true, 20, 8);
+                AtomicReference<Double> lissaFreq1 = new AtomicReference<>((double) 0);
+                AtomicReference<Double> lissaFreq2 = new AtomicReference<>((double) 0);
+                AtomicReference<Double> lissaPhi = new AtomicReference<>((double) 0);
 
                 simulationSteppingHandler = event -> {
-                    double lissaFreq1 = (int)freq1Slider.getValue();
-                    double lissaFreq2 = (int)freq2Slider.getValue();
-                    double lissaPhi = (int)phaseSlider.getValue() * Math.PI / 180;
+                    if (lissaPhi.get() != (int) phaseSlider.getValue() * PI / 180 ||
+                            lissaFreq1.get() != (int) freq1Slider.getValue() ||
+                                lissaFreq2.get() != (int) freq2Slider.getValue())   {
+                        //only executes if any slider value has actually changed (only care for integer slider values)
+                        lissaFreq1.set((double)((int) freq1Slider.getValue()));
+                        lissaFreq2.set((double)((int) freq2Slider.getValue()));
+                        lissaPhi.set((int) phaseSlider.getValue() * PI / 180); //already a double
 
+                        func.clear();
 
-                    func.clear();
+                        double angVel1 = 1;
+                        double angVel2 = lissaFreq2.get() / lissaFreq1.get();
 
-                    double angVel1 = 1;
-                    double angVel2 = lissaFreq2 / lissaFreq1;
+                        double amplitude = 1.0;
 
-                    double amplitude = 1.0;
-
-                    DifferentialSolver lissajous1 = new DifferentialSolver(DifferentialEquationType.ORDER2_UNDAMPED,
-                            new EquationParameters(amplitude,
-                                    0,
-                                    angVel1 * angVel1,
-                                    0.0, 0),
-                            0.0, FRAME_TIME);
-                    DifferentialSolver lissajous2 = new DifferentialSolver(DifferentialEquationType.ORDER2_UNDAMPED,
-                            new EquationParameters(amplitude * cos(lissaPhi),
-                                    -amplitude * angVel2 * sin(lissaPhi),
-                                    angVel2 * angVel2,
-                                    0.0, 0),
-                            0.0, FRAME_TIME / 10);
-                    for (int i = 0; i < graphSamples; i++) {
-                        ODEDataPoint dp1 = lissajous1.nextDataPoint();
-                        ODEDataPoint dp2 = lissajous2.stepSimByNSteps(10);
-                        ODEDataPoint dp = new ODEDataPoint(dp1.getY(), dp2.getY());
-                        func.add(dp);
+                        DifferentialSolver lissajous1 = new DifferentialSolver(DifferentialEquationType.ORDER2_UNDAMPED,
+                                new EquationParameters(amplitude,
+                                        0,
+                                        angVel1 * angVel1,
+                                        0.0, 0),
+                                0.0, FRAME_TIME);
+                        DifferentialSolver lissajous2 = new DifferentialSolver(DifferentialEquationType.ORDER2_UNDAMPED,
+                                new EquationParameters(amplitude * cos(lissaPhi.get()),
+                                        -amplitude * angVel2 * sin(lissaPhi.get()),
+                                        angVel2 * angVel2,
+                                        0.0, 0),
+                                0.0, FRAME_TIME / 10);
+                        for (int i = 0; i < graphSamples; i++) {
+                            ODEDataPoint dp1 = lissajous1.nextDataPoint();
+                            ODEDataPoint dp2 = lissajous2.stepSimByNSteps(10);
+                            ODEDataPoint dp = new ODEDataPoint(dp1.getY(), dp2.getY());
+                            func.add(dp);
+                        }
                     }
                     clearCanvas(mainCanvas);
                     graph.drawGraph(func);
@@ -404,9 +407,13 @@ public class FxController implements Initializable {
                 imgEqn.setImage(new Image(getClass().getResourceAsStream("resources/beats_param.png")));
                 break;
             case ("Lissajous Figures"):
+                availableControls.add(freq1Label);
                 availableControls.add(freq1Slider);
+                availableControls.add(freq2Label);
                 availableControls.add(freq2Slider);
+                availableControls.add(phaseLabel);
                 availableControls.add(phaseSlider);
+
                 canvasesPane.setDividerPosition(0,1.0);
                 canvasesPane.setDisable(true);
                 imgEqn.setImage(new Image(getClass().getResourceAsStream("resources/lissajous_param.png")));

@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.embed.swing.SwingNode?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.canvas.Canvas?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Slider?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TextField?>
@@ -69,9 +70,27 @@
                      <Font size="18.0" />
                  </font>
              </TextField>
-            <Slider fx:id="freq1Slider" blockIncrement="3.0" majorTickUnit="1.0" managed="false" max="10.0" minorTickCount="0" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="30.0" visible="false" />
-            <Slider fx:id="freq2Slider" blockIncrement="3.0" majorTickUnit="1.0" managed="false" max="10.0" minorTickCount="0" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="20.0" visible="false" />
-            <Slider fx:id="phaseSlider" blockIncrement="5.0" majorTickUnit="30.0" managed="false" max="180.0" min="-180.0" minorTickCount="5" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="90" visible="false" />
+            <Label fx:id="freq1Label" managed="false" visible="false" prefHeight="12.0" prefWidth="221.0" text="Omega1 frequency coefficient:">
+               <font>
+                  <Font name="Cambria" size="17.0" />
+               </font>
+
+            </Label>
+            <Slider fx:id="freq1Slider" managed="false" visible="false" blockIncrement="3.0" majorTickUnit="1.0" max="10.0" min="1.0" minorTickCount="0" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="3.0" />
+            <Label fx:id="freq2Label" managed="false" visible="false" text="Omega2 frequency coefficient:">
+               <font>
+                  <Font name="Cambria" size="17.0" />
+               </font>
+
+            </Label>
+            <Slider fx:id="freq2Slider" managed="false" visible="false" blockIncrement="3.0" majorTickUnit="1.0" max="10.0" min="1.0" minorTickCount="0" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="2.0" />
+            <Label fx:id="phaseLabel" managed="false" visible="false" text="Phase shift in degrees:">
+               <font>
+                  <Font name="Cambria" size="17.0" />
+               </font>
+
+            </Label>
+            <Slider fx:id="phaseSlider" managed="false" visible="false" blockIncrement="5.0" majorTickUnit="30.0" max="180.0" min="-180.0" minorTickCount="5" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="90" />
             <Button fx:id="playButton" managed="false" mnemonicParsing="false" onAction="#onPlayButtonPress" text="Play!" visible="false">
                <font>
                   <Font size="22.0" />
