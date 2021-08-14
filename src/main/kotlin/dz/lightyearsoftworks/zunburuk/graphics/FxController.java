@@ -222,49 +222,43 @@ public class FxController implements Initializable {
 
             //TODO frequencies higher than 10Hz produce nonsense figures, change to frequency slider?
             case ("Lissajous Figures"):
-                freq1 = (int)freq1Slider.getValue();
-                freq2 = (int)freq2Slider.getValue();
-                phi = (int)phaseSlider.getValue() * Math.PI / 180;
-
-                double angVel1 = 1;
-                double angVel2 = freq2 / freq1;
-
-                double amplitude = 1.0;
-
-                currentSystem1 = new DifferentialSolver(DifferentialEquationType.ORDER2_UNDAMPED,
-                        new EquationParameters(amplitude,
-                                0,
-                                angVel1 * angVel1,
-                                0.0, 0),
-                        0.0, FRAME_TIME);
-                currentSystem2 = new DifferentialSolver(DifferentialEquationType.ORDER2_UNDAMPED,
-                        new EquationParameters(amplitude * cos(phi),
-                                -amplitude * angVel2 * sin(phi),
-                                angVel2 * angVel2,
-                                0.0, 0),
-                        0.0, FRAME_TIME / 10);
-
                 ArrayList<ODEDataPoint> func = new ArrayList<>();
-                int graphSamples = (int)(100.0 / (angVel1 * FRAME_TIME));
-                //double Zi = 0.0;
-                for (int i = 0; i < graphSamples; i++) {
-
-                    ODEDataPoint dp1 = currentSystem1.nextDataPoint();
-                    ODEDataPoint dp2 = currentSystem2.stepSimByNSteps(10);
-                    ODEDataPoint dp = new ODEDataPoint(dp1.getY(), dp2.getY());
-
-
-
-                    //ODEDataPoint dp = new ODEDataPoint(amplitude * cos(angVel1 * Zi), amplitude * cos(angVel2 * Zi + phi));
-                    func.add(dp);
-                    //Zi += FRAME_TIME;
-                }
-
+                int graphSamples = (int)(100.0 / (FRAME_TIME));
                 graph = new GraphPlot(picassoThePainter, true, 20, 8);
+
                 simulationSteppingHandler = event -> {
+                    double lissaFreq1 = (int)freq1Slider.getValue();
+                    double lissaFreq2 = (int)freq2Slider.getValue();
+                    double lissaPhi = (int)phaseSlider.getValue() * Math.PI / 180;
+
+
+                    func.clear();
+
+                    double angVel1 = 1;
+                    double angVel2 = lissaFreq2 / lissaFreq1;
+
+                    double amplitude = 1.0;
+
+                    DifferentialSolver lissajous1 = new DifferentialSolver(DifferentialEquationType.ORDER2_UNDAMPED,
+                            new EquationParameters(amplitude,
+                                    0,
+                                    angVel1 * angVel1,
+                                    0.0, 0),
+                            0.0, FRAME_TIME);
+                    DifferentialSolver lissajous2 = new DifferentialSolver(DifferentialEquationType.ORDER2_UNDAMPED,
+                            new EquationParameters(amplitude * cos(lissaPhi),
+                                    -amplitude * angVel2 * sin(lissaPhi),
+                                    angVel2 * angVel2,
+                                    0.0, 0),
+                            0.0, FRAME_TIME / 10);
+                    for (int i = 0; i < graphSamples; i++) {
+                        ODEDataPoint dp1 = lissajous1.nextDataPoint();
+                        ODEDataPoint dp2 = lissajous2.stepSimByNSteps(10);
+                        ODEDataPoint dp = new ODEDataPoint(dp1.getY(), dp2.getY());
+                        func.add(dp);
+                    }
                     clearCanvas(mainCanvas);
                     graph.drawGraph(func);
-                    sliderListener(null);
                 };
                 break;
             default:
@@ -276,10 +270,6 @@ public class FxController implements Initializable {
             currentAnimation.setCycleCount(Timeline.INDEFINITE);
             currentAnimation.play();
         }
-    }
-
-    public void sliderListener(MouseEvent actionEvent) {
-        onPlayButtonPress(null);
     }
 
     private Clip playAudio(ArrayList<ODEDataPoint> function, double maxVolume) throws LineUnavailableException, IOException {
