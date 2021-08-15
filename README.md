@@ -11,3 +11,5 @@ Zunburuk is written mostly in Java with JavaFX graphics, It uses a Runge-Kutta s
 
 Not super accurate if you use excessively large parameters... If you find a discrepancy
 between what you see here and what you see on a book, I'd trust the book instead.
+
+To download, go to the release tag on the left and select the asset you want.
