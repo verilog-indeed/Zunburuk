@@ -33,7 +33,6 @@ public class FxController implements Initializable {
     public ComboBox<String> oscillationTypeComboBox;
     public TextField gravityInputField;
     public TextField lengthInputField;
-    public TextField maxAngleInputField;
     public TextField springConstInputField;
     public TextField massInputField;
     public TextField maxDisplacementInputField;
@@ -43,7 +42,6 @@ public class FxController implements Initializable {
     public TextField dampingFactorInputField;
     public TextField freq1InputField;
     public TextField freq2InputField;
-    public TextField phaseInputField;
     public Canvas secondaryCanvas;
     public SplitPane canvasesPane;
     public Slider freq1Slider;
@@ -83,7 +81,7 @@ public class FxController implements Initializable {
         switch (oscillationTypeComboBox.getValue()) {
             case ("Simple Pendulum"):
                 try {
-                    maxAngle = Double.parseDouble(maxAngleInputField.getText()) * (Math.PI / 180.0);
+                    maxAngle = phaseSlider.getValue() * (Math.PI / 180.0);
                     gravity = Double.parseDouble(gravityInputField.getText());
                     tetherLength = Double.parseDouble(lengthInputField.getText());
                 } catch (NumberFormatException e)   {
@@ -113,6 +111,7 @@ public class FxController implements Initializable {
                     redrawBase();
                     graph.drawNextFrame(dp);
                 };
+                playButton.setText("Update");
                 break;
             case ("Mass on a Vertical Spring"):
                 try {
@@ -145,6 +144,7 @@ public class FxController implements Initializable {
                     redrawBase();
                     graph.drawNextFrame(dp);
                 };
+                playButton.setText("Update");
                 break;
             case ("Damped Mass on a Vertical Spring"):
                 try {
@@ -177,12 +177,13 @@ public class FxController implements Initializable {
                     redrawBase();
                     graph.drawNextFrame(dp);
                 };
-            break;
-            case ("Beats demo"):
+                playButton.setText("Update");
+                break;
+            case ("Audio beats (sinewave superposition)"):
                 try {
                     freq1 = Double.parseDouble(freq1InputField.getText());
                     freq2 = Double.parseDouble(freq2InputField.getText());
-                    phi = Double.parseDouble(phaseInputField.getText()) * (Math.PI / 180.0);
+                    phi = 0.0;
                 } catch (NumberFormatException e)   {
                     throw new RuntimeException("fix your regex, 7mar");
                 }
@@ -205,7 +206,6 @@ public class FxController implements Initializable {
                     e.printStackTrace();
                 }
 
-                //TODO might be worth having each oscillator with an independent amplitude?
                 graph = new GraphPlot(picassoThePainter, false, 4, 8);
                 AtomicReference<Double> finalXi = new AtomicReference<>(0.0);
                 simulationSteppingHandler = event -> {
@@ -214,6 +214,7 @@ public class FxController implements Initializable {
                     clearCanvas(mainCanvas);
                     graph.drawNextFrame(dp);
                 };
+                playButton.setText("Update");
                 break;
 
             //TODO frequencies higher than 10Hz produce nonsense figures, change to frequency slider?
@@ -239,17 +240,16 @@ public class FxController implements Initializable {
                         double angVel1 = 1;
                         double angVel2 = lissaFreq2.get() / lissaFreq1.get();
 
-                        double amplitude = 1.0;
 
                         DifferentialSolver lissajous1 = new DifferentialSolver(DifferentialEquationType.ORDER2_UNDAMPED,
-                                new EquationParameters(amplitude,
+                                new EquationParameters(1.0,
                                         0,
                                         angVel1 * angVel1,
                                         0.0, 0),
                                 0.0, FRAME_TIME);
                         DifferentialSolver lissajous2 = new DifferentialSolver(DifferentialEquationType.ORDER2_UNDAMPED,
-                                new EquationParameters(amplitude * cos(lissaPhi.get()),
-                                        -amplitude * angVel2 * sin(lissaPhi.get()),
+                                new EquationParameters(cos(lissaPhi.get()),
+                                        -angVel2 * sin(lissaPhi.get()),
                                         angVel2 * angVel2,
                                         0.0, 0),
                                 0.0, FRAME_TIME / 10);
@@ -263,6 +263,8 @@ public class FxController implements Initializable {
                     clearCanvas(mainCanvas);
                     graph.drawGraph(func);
                 };
+                playButton.setVisible(false);
+                playButton.setManaged(false);
                 break;
             default:
                 simulationSteppingHandler = null;
@@ -366,17 +368,22 @@ public class FxController implements Initializable {
         oscillationTypeComboBox.getItems().add("Simple Pendulum");
         oscillationTypeComboBox.getItems().add("Mass on a Vertical Spring");
         oscillationTypeComboBox.getItems().add("Damped Mass on a Vertical Spring");
-        oscillationTypeComboBox.getItems().add("Beats demo");
+        oscillationTypeComboBox.getItems().add("Audio beats (sinewave superposition)");
         oscillationTypeComboBox.getItems().add("Lissajous Figures");
+
     }
 
     public void onSimTypeSelection(ActionEvent actionEvent) {
         hideControls();
         switch (oscillationTypeComboBox.getValue()) {
             case ("Simple Pendulum"):
+                phaseLabel.setText("Initial angular displacement in degrees:");
+
                 availableControls.add(gravityInputField);
                 availableControls.add(lengthInputField);
-                availableControls.add(maxAngleInputField);
+                availableControls.add(phaseLabel);
+                availableControls.add(phaseSlider);
+
                 canvasesPane.setDividerPosition(0,0.65);
                 canvasesPane.setDisable(false);
                 imgEqn.setImage(new Image(getClass().getResourceAsStream("resources/ode_pendulum.png")));
@@ -398,15 +405,16 @@ public class FxController implements Initializable {
                 canvasesPane.setDisable(false);
                 imgEqn.setImage(new Image(getClass().getResourceAsStream("resources/ode_springmass_damped.png")));
                 break;
-            case ("Beats demo"):
+            case ("Audio beats (sinewave superposition)"):
                 availableControls.add(freq1InputField);
                 availableControls.add(freq2InputField);
-                availableControls.add(phaseInputField);
                 canvasesPane.setDividerPosition(0,1.0);
                 canvasesPane.setDisable(true);
                 imgEqn.setImage(new Image(getClass().getResourceAsStream("resources/beats_param.png")));
                 break;
             case ("Lissajous Figures"):
+                phaseLabel.setText("Phase shift in degrees:");
+
                 availableControls.add(freq1Label);
                 availableControls.add(freq1Slider);
                 availableControls.add(freq2Label);
@@ -454,9 +462,9 @@ public class FxController implements Initializable {
 
         playButton.setManaged(false);
         playButton.setVisible(false);
+        playButton.setText("Play!");
 
         for (Control t: availableControls)  {
-            //t.clear();
             t.setManaged(false);
             t.setVisible(false);
         }
