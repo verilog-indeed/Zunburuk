@@ -12,6 +12,15 @@ import static dz.lightyearsoftworks.zunburuk.graphics.GraphicsConstants.*;
 
 interface GraphicsConstants {
     double FRAME_TIME = 1.0 / 60.0;
+    double PENDULUM_TETHER_SCALE = 100.0;
+    double BASE_HEIGHT = 10.0;
+    double BASE_WIDTH = 35.0;
+    double PENDULUM_BOB_BOUNDINGBOX_LENGTH = 35.0;
+    double SPRING_SEGMENT_MULTIPLIER = 4.0;
+    double SPRING_SEGMENT_ANGLE_BIAS = (Math.PI / 6.0);
+    double SPRING_SEGMENT_MIN_ANGLE = (Math.PI / 8.0);
+    double SPRING_SEGMENT_LENGTH = 60.0;
+    double SPRING_MASS_BOX_LENGTH = 55.0;
 }
 
 class GraphPlot  {

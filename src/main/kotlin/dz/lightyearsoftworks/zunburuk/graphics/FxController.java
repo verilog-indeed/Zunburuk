@@ -104,11 +104,14 @@ public class FxController implements Initializable {
                 simulationSteppingHandler = event -> {
                     //skip through 100 datapoints to sync up animation timestep and simulation timestep
                     //anim timestep is 1/60, sim timestep is 1/6000
+                    double width = mainCanvas.getWidth();
+                    double height = mainCanvas.getHeight();
+
                     ODEDataPoint dp = currentSystem1.stepSimByNSteps(100);
                     clearCanvas(mainCanvas);
                     clearCanvas(secondaryCanvas);
-                    redrawPendulum(dp, tetherLength);
-                    redrawBase();
+                    redrawPendulum(dp, tetherLength, (width + BASE_WIDTH) / 2.0 - BASE_WIDTH / 2.0, height / 3.0 - BASE_HEIGHT / 4.0);
+                    redrawBase(width / 2.0, height / 3.0);
                     graph.drawNextFrame(dp);
                 };
                 playButton.setText("Update");
@@ -137,11 +140,14 @@ public class FxController implements Initializable {
                 graph = new GraphPlot(rembrandtTheRevered, false, 20, 8);
 
                 simulationSteppingHandler = event -> {
+                    double width = mainCanvas.getWidth();
+                    double height = mainCanvas.getHeight();
+
                     ODEDataPoint dp = currentSystem1.stepSimByNSteps(100);
                     clearCanvas(mainCanvas);
                     clearCanvas(secondaryCanvas);
-                    redrawSpringMass(dp, maxDisplacement);
-                    redrawBase();
+                    redrawSpringMass(dp, maxDisplacement, width / 2.0, height / 10.0 + BASE_HEIGHT / 2.0);
+                    redrawBase(width / 2.0, height / 10.0);
                     graph.drawNextFrame(dp);
                 };
                 playButton.setText("Update");
@@ -170,11 +176,14 @@ public class FxController implements Initializable {
                         0.0, FRAME_TIME / 100);
                 graph = new GraphPlot(rembrandtTheRevered, false, 20, 8);
                 simulationSteppingHandler = event -> {
+                    double width = mainCanvas.getWidth();
+                    double height = mainCanvas.getHeight();
+
                     ODEDataPoint dp = currentSystem1.stepSimByNSteps(100);
                     clearCanvas(mainCanvas);
                     clearCanvas(secondaryCanvas);
-                    redrawSpringMass(dp, maxDisplacement);
-                    redrawBase();
+                    redrawSpringMass(dp, maxDisplacement, width / 2.0, height / 10.0 + BASE_HEIGHT / 2.0);
+                    redrawBase(width / 2.0, height / 10.0);
                     graph.drawNextFrame(dp);
                 };
                 playButton.setText("Update");
@@ -217,7 +226,6 @@ public class FxController implements Initializable {
                 playButton.setText("Update");
                 break;
 
-            //TODO frequencies higher than 10Hz produce nonsense figures, change to frequency slider?
             case ("Lissajous Figures"):
                 ArrayList<ODEDataPoint> func = new ArrayList<>();
                 int graphSamples = (int)(100.0 / (FRAME_TIME));
@@ -292,61 +300,58 @@ public class FxController implements Initializable {
         return clang;
     }
 
-    private void redrawSpringMass(ODEDataPoint dp, double maxDisplacement) {
-        double width = mainCanvas.getWidth(); //double height = mainCanvas.getHeight();
+    private void redrawSpringMass(ODEDataPoint dp, double maxDisplacement, double xOffset, double yOffset) {
         picassoThePainter.setLineWidth(3.0);
-        double baseX = width/2.0; double baseY = 60;
-        int springSegs = (int) (maxDisplacement * 4.0);
+        double baseX = xOffset; double baseY = yOffset;
+        int springSegs = (int) (maxDisplacement * SPRING_SEGMENT_MULTIPLIER);
         //theta is the angle going counter-clockwise from the y-axis to the spring segment
-        double theta = (Math.PI / 6.0) * (1 - (dp.getY() / maxDisplacement)) + (Math.PI / 8.0);
-        //draw the small segment connecting the base and the spring independently
-        picassoThePainter.strokeLine(baseX, baseY, baseX + 20 * Math.sin(theta), baseY + 20 * cos(theta));
-        baseX += 20 * Math.sin(theta);
-        baseY += 20 * cos(theta);
+        double theta = SPRING_SEGMENT_ANGLE_BIAS * (1 - (dp.getY() / maxDisplacement)) + SPRING_SEGMENT_MIN_ANGLE;
+        //draw the small segment connecting the base and the spring independently, it is half as long as the normal segments
+        picassoThePainter.strokeLine(baseX, baseY, baseX + 0.5 * SPRING_SEGMENT_LENGTH * sin(theta), baseY + 0.5 * SPRING_SEGMENT_LENGTH * cos(theta));
+        baseX += 0.5 * SPRING_SEGMENT_LENGTH * Math.sin(theta);
+        baseY += 0.5 * SPRING_SEGMENT_LENGTH * cos(theta);
         theta = -theta;
         //the rest of the spring segments
         for (int i = 0; i < springSegs; i++)   {
-            picassoThePainter.strokeLine(baseX, baseY, baseX + 40 * Math.sin(theta), baseY + 40 * cos(theta));
-            baseX += 40 * Math.sin(theta);
-            baseY += 40 * cos(theta);
+            picassoThePainter.strokeLine(baseX, baseY, baseX + SPRING_SEGMENT_LENGTH * sin(theta), baseY + SPRING_SEGMENT_LENGTH * cos(theta));
+            baseX += SPRING_SEGMENT_LENGTH * Math.sin(theta);
+            baseY += SPRING_SEGMENT_LENGTH * cos(theta);
             theta = -theta; //reverse x-direction of the next spring segment
         }
-        //draw the small segment connecting the spring and the block independently
-        picassoThePainter.strokeLine(baseX, baseY, baseX + 20 * Math.sin(theta), baseY + 20 * cos(theta));
-        baseX += 20 * Math.sin(theta);
-        baseY += 20 * cos(theta);
+        //draw the small segment connecting the spring and the block independently, it is half as long as the normal segments
+        picassoThePainter.strokeLine(baseX, baseY, baseX + 0.5 * SPRING_SEGMENT_LENGTH * sin(theta), baseY + 0.5 * SPRING_SEGMENT_LENGTH * cos(theta));
+        baseX += 0.5 * SPRING_SEGMENT_LENGTH * Math.sin(theta);
+        baseY += 0.5 * SPRING_SEGMENT_LENGTH * cos(theta);
         //draw the mass block
         picassoThePainter.setLineWidth(5.0);
         picassoThePainter.setFill(Color.DARKCYAN);
-        picassoThePainter.fillRect(baseX - 20, baseY, 40, 40);
-        picassoThePainter.strokeRect(baseX - 20, baseY, 40, 40);
+        picassoThePainter.fillRect(baseX - 0.5 * SPRING_MASS_BOX_LENGTH, baseY, SPRING_MASS_BOX_LENGTH, SPRING_MASS_BOX_LENGTH);
+        picassoThePainter.strokeRect(baseX - 0.5 * SPRING_MASS_BOX_LENGTH, baseY, SPRING_MASS_BOX_LENGTH, SPRING_MASS_BOX_LENGTH);
     }
 
-    private void redrawPendulum(ODEDataPoint dp, double wireLength) {
-        double width = mainCanvas.getWidth();
+    private void redrawPendulum(ODEDataPoint dp, double wireLength, double xOffset, double yOffset) {
         picassoThePainter.setLineWidth(3.0);
         //datapoints give the value of the angle going counterclockwise from the y-axis to the tether
-        double currentX = width/2.0 + 100 * wireLength * Math.sin(dp.getY());
-        double currentY = 60 + 100 * wireLength * cos(dp.getY());
-        picassoThePainter.strokeLine(width/2.0,
-                60,
+        double currentX = xOffset + PENDULUM_TETHER_SCALE * wireLength * sin(dp.getY());
+        double currentY = yOffset + PENDULUM_TETHER_SCALE * wireLength * cos(dp.getY());
+        picassoThePainter.strokeLine(xOffset,
+                yOffset,
                 currentX,
                 currentY);
         //drawing the pendulum bob
         picassoThePainter.setFill(Color.INDIANRED);
-        picassoThePainter.fillOval(currentX - 15.0,currentY - 15.0,30.0,30.0);
-        picassoThePainter.strokeOval(currentX - 15.0,currentY - 15.0,30.0,30.0);
+        picassoThePainter.fillOval(currentX - PENDULUM_BOB_BOUNDINGBOX_LENGTH / 2.0,currentY - PENDULUM_BOB_BOUNDINGBOX_LENGTH / 2.0, PENDULUM_BOB_BOUNDINGBOX_LENGTH, PENDULUM_BOB_BOUNDINGBOX_LENGTH);
+        picassoThePainter.strokeOval(currentX - PENDULUM_BOB_BOUNDINGBOX_LENGTH / 2.0,currentY - PENDULUM_BOB_BOUNDINGBOX_LENGTH / 2.0,PENDULUM_BOB_BOUNDINGBOX_LENGTH, PENDULUM_BOB_BOUNDINGBOX_LENGTH);
         picassoThePainter.setLineWidth(1.0);
     }
 
-    private void redrawBase() {
+    private void redrawBase(double xOffset, double yOffset) {
         //draws a nice lil rectangular base
-        double width = mainCanvas.getWidth(); double height = mainCanvas.getHeight();
         picassoThePainter.setFill(Color.GRAY);
-        picassoThePainter.fillRect(width/2.0 - 50.0, 40.0, 100.0, 20.0);
+        picassoThePainter.fillRect(xOffset - BASE_WIDTH / 2.0, yOffset - BASE_HEIGHT / 2.0, BASE_WIDTH, BASE_HEIGHT);
         picassoThePainter.setLineWidth(2.0);
         picassoThePainter.setStroke(Color.BLACK);
-        picassoThePainter.strokeRect(width/2.0 - 50.0, 40.0, 100.0, 20.0);
+        picassoThePainter.strokeRect(xOffset - BASE_WIDTH / 2.0, yOffset - BASE_HEIGHT / 2.0, BASE_WIDTH, BASE_HEIGHT);
         picassoThePainter.setLineWidth(1.0);
     }
 
