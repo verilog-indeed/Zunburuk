@@ -17,5 +17,5 @@ public interface GraphicsConstants {
     int FUNC_GRAPH_XTICKS = 20;
     int FUNC_GRAPH_YTICKS = 8;
     Paint FUNCTION_GRAPH_COLOR = Color.RED;
-    Paint LISSAJOUS_GRAPH_COLOR = Color.BLUEVIOLET;
+    Paint LISSAJOUS_GRAPH_COLOR = Color.ROYALBLUE;
 }
