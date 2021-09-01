@@ -27,10 +27,8 @@ class GraphPlot  {
     private ArrayList<ODEDataPoint> dataSeries;
     private final GraphicsContext rembrandtTheRevered;
     private final boolean lissajousMode;
-    //default 20?
     private final int MAX_MAJOR_XAXIS_TICKS_ONSCREEN;
     private final int MAX_MAJOR_YAXIS_TICKS_ONSCREEN;
-    //because theres 60 datapoints per second, should probably make that a constant too
     private final int MAX_POINTS_ONSCREEN;
 
     public void drawGraph(ArrayList<ODEDataPoint> function)   {

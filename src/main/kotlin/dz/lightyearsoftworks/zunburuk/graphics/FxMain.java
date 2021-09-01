@@ -15,7 +15,7 @@ public class FxMain extends Application {
 
     @Override
     public void start(Stage pStage) throws IOException {
-        ResourceBundle bund = ResourceBundle.getBundle("dz.lightyearsoftworks.zunburuk.graphics.resources.strings", new Locale("ar"));
+        ResourceBundle bund = ResourceBundle.getBundle("dz.lightyearsoftworks.zunburuk.graphics.resources.strings", new Locale("en"));
         FXMLLoader loader = new FXMLLoader(getClass().getResource("main_stylesheet.fxml"), bund);
         loader.load();
         Parent root = loader.getRoot();

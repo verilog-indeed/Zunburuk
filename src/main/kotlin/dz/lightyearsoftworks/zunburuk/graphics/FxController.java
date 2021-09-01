@@ -27,6 +27,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static dz.lightyearsoftworks.zunburuk.graphics.GraphicsConstants.*;
 import static java.lang.Math.*;
+import static java.lang.System.currentTimeMillis;
 
 
 public class FxController implements Initializable {
@@ -235,6 +236,7 @@ public class FxController implements Initializable {
                 AtomicReference<Double> lissaPhi = new AtomicReference<>((double) 0);
 
                 simulationSteppingHandler = event -> {
+                    //double deltaT = System.nanoTime();
                     if (lissaPhi.get() != (int) phaseSlider.getValue() * PI / 180 ||
                             lissaFreq1.get() != (int) freq1Slider.getValue() ||
                                 lissaFreq2.get() != (int) freq2Slider.getValue())   {
@@ -260,16 +262,18 @@ public class FxController implements Initializable {
                                         -angVel2 * sin(lissaPhi.get()),
                                         angVel2 * angVel2,
                                         0.0, 0),
-                                0.0, FRAME_TIME / 10);
+                                0.0, FRAME_TIME / 5.0);
                         for (int i = 0; i < graphSamples; i++) {
                             ODEDataPoint dp1 = lissajous1.nextDataPoint();
-                            ODEDataPoint dp2 = lissajous2.stepSimByNSteps(10);
+                            ODEDataPoint dp2 = lissajous2.stepSimByNSteps(5);
                             ODEDataPoint dp = new ODEDataPoint(dp1.getY(), dp2.getY());
                             func.add(dp);
                         }
                     }
                     clearCanvas(mainCanvas);
                     graph.drawGraph(func);
+                    //deltaT = System.nanoTime() - deltaT;
+                    //System.out.println(deltaT / 1000.0);
                 };
                 playButton.setVisible(false);
                 playButton.setManaged(false);
