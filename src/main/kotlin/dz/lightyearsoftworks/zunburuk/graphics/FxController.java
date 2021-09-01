@@ -101,7 +101,7 @@ public class FxController implements Initializable {
                                 gravity / tetherLength,
                                 0, 0),
                         0.0, FRAME_TIME / 100);
-                graph = new GraphPlot(rembrandtTheRevered, false, 20, 8);
+                graph = new FunctionalGraphPlot(secondaryCanvas, FUNC_GRAPH_XTICKS, FUNC_GRAPH_YTICKS);
                 simulationSteppingHandler = event -> {
                     //skip through 100 datapoints to sync up animation timestep and simulation timestep
                     //anim timestep is 1/60, sim timestep is 1/6000
@@ -138,7 +138,7 @@ public class FxController implements Initializable {
                                 springConst / mass,
                                 0, 0),
                         0.0, FRAME_TIME / 100);
-                graph = new GraphPlot(rembrandtTheRevered, false, 20, 8);
+                graph = new FunctionalGraphPlot(secondaryCanvas, FUNC_GRAPH_XTICKS, FUNC_GRAPH_YTICKS);
 
                 simulationSteppingHandler = event -> {
                     double width = mainCanvas.getWidth();
@@ -175,7 +175,7 @@ public class FxController implements Initializable {
                                 springConst / mass,
                                 dampingFactor / mass, 0),
                         0.0, FRAME_TIME / 100);
-                graph = new GraphPlot(rembrandtTheRevered, false, 20, 8);
+                graph = new FunctionalGraphPlot(secondaryCanvas, FUNC_GRAPH_XTICKS, FUNC_GRAPH_YTICKS);
                 simulationSteppingHandler = event -> {
                     double width = mainCanvas.getWidth();
                     double height = mainCanvas.getHeight();
@@ -216,7 +216,7 @@ public class FxController implements Initializable {
                     e.printStackTrace();
                 }
 
-                graph = new GraphPlot(picassoThePainter, false, 4, 8);
+                graph = new FunctionalGraphPlot(mainCanvas, 4, 8);
                 AtomicReference<Double> finalXi = new AtomicReference<>(0.0);
                 simulationSteppingHandler = event -> {
                     ODEDataPoint dp = new ODEDataPoint(finalXi.get(), cos(angFreq1 * finalXi.get()) + cos(angFreq2 * finalXi.get() + phi));
@@ -230,13 +230,12 @@ public class FxController implements Initializable {
             case ("Lissajous Figures"):
                 ArrayList<ODEDataPoint> func = new ArrayList<>();
                 int graphSamples = (int)(100.0 / (FRAME_TIME));
-                graph = new GraphPlot(picassoThePainter, true, 20, 8);
+                graph = new LissajousGraphPlot(mainCanvas);
                 AtomicReference<Double> lissaFreq1 = new AtomicReference<>((double) 0);
                 AtomicReference<Double> lissaFreq2 = new AtomicReference<>((double) 0);
                 AtomicReference<Double> lissaPhi = new AtomicReference<>((double) 0);
 
                 simulationSteppingHandler = event -> {
-                    //double deltaT = System.nanoTime();
                     if (lissaPhi.get() != (int) phaseSlider.getValue() * PI / 180 ||
                             lissaFreq1.get() != (int) freq1Slider.getValue() ||
                                 lissaFreq2.get() != (int) freq2Slider.getValue())   {
@@ -271,9 +270,7 @@ public class FxController implements Initializable {
                         }
                     }
                     clearCanvas(mainCanvas);
-                    graph.drawGraph(func);
-                    //deltaT = System.nanoTime() - deltaT;
-                    //System.out.println(deltaT / 1000.0);
+                    ((LissajousGraphPlot)graph).drawGraph(func);
                 };
                 playButton.setVisible(false);
                 playButton.setManaged(false);
